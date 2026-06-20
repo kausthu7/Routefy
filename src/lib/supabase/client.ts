@@ -1,0 +1,7 @@
+import { createClient } from '@supabase/supabase-js';
+
+// Use environment variables for URL and Key
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock-url.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-anon-key';
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
