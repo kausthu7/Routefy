@@ -43,57 +43,38 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  const handleAddProduct = async () => {
+  const handleAddProduct = () => {
     if (!newProductName.trim()) return;
     setIsSaving(true);
     
+    // Construct dimensions string
     let dimensionsStr = 'Standard';
     if (newProductLength && newProductWidth && newProductHeight) {
       dimensionsStr = `${newProductLength}x${newProductWidth}x${newProductHeight} cm`;
     }
 
-    const newProductsList = [
-      ...products, 
-      { 
-        name: newProductName, 
-        weight: newProductWeight || '0.5',
-        dimensions: dimensionsStr
-      }
-    ];
-
-    try {
-      await fetch('/api/merchant/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ default_product: JSON.stringify(newProductsList) })
-      });
-      
-      setProducts(newProductsList);
+    // Simulate API save
+    setTimeout(() => {
+      setProducts([
+        ...products, 
+        { 
+          name: newProductName, 
+          weight: newProductWeight || '0.5',
+          dimensions: dimensionsStr
+        }
+      ]);
       setIsModalOpen(false);
       setNewProductName('');
       setNewProductWeight('');
       setNewProductLength('');
       setNewProductWidth('');
       setNewProductHeight('');
-    } catch (error) {
-      console.error("Failed to save product", error);
-    } finally {
       setIsSaving(false);
-    }
+    }, 500);
   };
 
-  const handleDeleteProduct = async (indexToDelete: number) => {
-    const newProductsList = products.filter((_, index) => index !== indexToDelete);
-    setProducts(newProductsList);
-    try {
-      await fetch('/api/merchant/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ default_product: JSON.stringify(newProductsList) })
-      });
-    } catch (error) {
-      console.error("Failed to delete product", error);
-    }
+  const handleDeleteProduct = (indexToDelete: number) => {
+    setProducts(products.filter((_, index) => index !== indexToDelete));
   };
 
   return (

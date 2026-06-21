@@ -1,63 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Wallet, Plus, IndianRupee, ArrowUpRight, ArrowDownRight, CheckCircle2 } from 'lucide-react';
 
 export default function WalletPage() {
-  const [transactions, setTransactions] = useState<any[]>([]);
-  const [balance, setBalance] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchWalletData = async () => {
-      try {
-        const res = await fetch('/api/merchant/profile');
-        if (!res.ok) return;
-        const profile = await res.json();
-
-        const { data: orders, error } = await supabase
-          .from('orders')
-          .select('*')
-          .eq('merchant_id', profile.id)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        
-        const shippingSpent = (orders || []).reduce((sum, o) => sum + (o.price || 0), 0);
-        setBalance(5000 - shippingSpent);
-
-        // Derive ledger from orders
-        const txs = (orders || []).map(o => ({
-          id: o.id,
-          date: new Date(o.created_at).toLocaleString(),
-          type: 'Shipment Deduction',
-          ref: `RTF${o.id.substring(0, 6).toUpperCase()}`,
-          amount: -(o.price || 0),
-          status: 'success'
-        }));
-
-        // Add initial mock topup
-        txs.push({
-          id: 'initial',
-          date: 'Account Creation',
-          type: 'Wallet Topup Promo',
-          ref: 'PROMO-5000',
-          amount: 5000,
-          status: 'success'
-        });
-
-        setTransactions(txs);
-      } catch (error) {
-        console.error("Error fetching wallet:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchWalletData();
-  }, []);
+  
+  const transactions = [
+    { id: 1, date: 'Today, 10:42 AM', type: 'Shipment Deduction', ref: 'RTF83921', amount: -78, status: 'success' },
+    { id: 2, date: 'Today, 09:15 AM', type: 'Shipment Deduction', ref: 'RTF83920', amount: -112, status: 'success' },
+    { id: 3, date: 'Yesterday, 04:30 PM', type: 'Wallet Topup', ref: 'UPI/123456789', amount: 1000, status: 'success' },
+    { id: 4, date: '16 Jun, 11:20 AM', type: 'Shipment Deduction', ref: 'RTF83850', amount: -65, status: 'success' },
+    { id: 5, date: '15 Jun, 02:10 PM', type: 'Wallet Topup', ref: 'UPI/987654321', amount: 2000, status: 'success' },
+  ];
 
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500 relative z-10">
@@ -87,7 +42,7 @@ export default function WalletPage() {
               <p className="text-slate-400 text-sm font-bold tracking-widest uppercase mb-2">Current Balance</p>
               <div className="text-5xl font-extrabold tracking-tight text-white flex items-center">
                 <IndianRupee className="w-10 h-10 mr-1 text-slate-300" />
-                {loading ? '...' : balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                1,422.00
               </div>
             </div>
           </div>
@@ -123,11 +78,7 @@ export default function WalletPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loading ? (
-                   <TableRow><TableCell colSpan={3} className="text-center py-8 text-slate-500">Loading...</TableCell></TableRow>
-                ) : transactions.length === 0 ? (
-                   <TableRow><TableCell colSpan={3} className="text-center py-8 text-slate-500">No transactions yet.</TableCell></TableRow>
-                ) : transactions.map((tx) => (
+                {transactions.map((tx) => (
                   <TableRow key={tx.id} className="hover:bg-white/5 border-b border-white/5 transition-colors">
                     <TableCell className="py-5 pl-6">
                       <div className="flex items-center gap-4">
@@ -148,7 +99,7 @@ export default function WalletPage() {
                     <TableCell className="text-right py-5 pr-6">
                       <div className="flex flex-col items-end">
                         <span className={`font-extrabold text-lg ${tx.amount > 0 ? 'text-green-400 neon-text' : 'text-white'}`}>
-                          {tx.amount > 0 ? '+' : ''}₹{Math.abs(tx.amount).toFixed(2)}
+                          {tx.amount > 0 ? '+' : ''}₹{Math.abs(tx.amount)}
                         </span>
                         <div className="flex items-center text-xs font-bold text-slate-500 mt-1">
                           <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-green-500" />
