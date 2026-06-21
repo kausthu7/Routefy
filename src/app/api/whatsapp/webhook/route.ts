@@ -193,6 +193,12 @@ async function downloadWhatsAppMediaToFile(mediaId: string): Promise<string> {
 
 // Send WhatsApp Message Helper
 async function sendWhatsAppMessage(phone_number_id: string, to: string, text: string) {
+  // Record for Simulator
+  const { data: m } = await supabase.from('merchants').select('id').filter('phone_number', 'ilike', `%${to.slice(-10)}%`).single();
+  if (m) {
+    await supabase.from('ai_messages').insert([{ merchant_id: m.id, sender: 'ai', text_content: text }]);
+  }
+
   if (process.env.WHATSAPP_TOKEN) {
     await fetch(`https://graph.facebook.com/v17.0/${phone_number_id}/messages`, {
       method: 'POST',
@@ -229,6 +235,17 @@ async function sendWhatsAppInteractive(phone_number_id: string, to: string, orde
   });
 
   const messageText = `We found ${top3.length} shipping options for this delivery.\n\nPlease select your preferred courier:`;
+  const optionsText = buttons.map(b => `🔘 ${b.reply.title} |__ID__${b.reply.id}__|`).join('\n');
+
+  // Record for Simulator
+  const { data: m } = await supabase.from('merchants').select('id').filter('phone_number', 'ilike', `%${to.slice(-10)}%`).single();
+  if (m) {
+    await supabase.from('ai_messages').insert([{ 
+      merchant_id: m.id, 
+      sender: 'ai', 
+      text_content: `${messageText}\n\n${optionsText}` 
+    }]);
+  }
 
   if (process.env.WHATSAPP_TOKEN) {
     await fetch(`https://graph.facebook.com/v17.0/${phone_number_id}/messages`, {
