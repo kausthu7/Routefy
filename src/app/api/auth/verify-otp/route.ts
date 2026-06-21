@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { supabase } from '@/lib/supabase/client';
+import { sql } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
@@ -16,19 +16,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 401 });
     }
 
-    // OTP verified successfully.
-    // Ensure merchant exists in Supabase
-    const { data: existingMerchant } = await supabase
-      .from('merchants')
-      .select('id')
-      .eq('phone_number', phone)
-      .single();
+    // Ensure merchant exists in Postgres
+    const { rows } = await sql`
+      SELECT id FROM merchants WHERE phone_number = ${phone}
+    `;
+    const existingMerchant = rows[0];
 
     if (!existingMerchant) {
-      await supabase.from('merchants').insert([{ phone_number: phone, shop_name: name || null }]);
+      await sql`
+        INSERT INTO merchants (phone_number, shop_name)
+        VALUES (${phone}, ${name || null})
+      `;
     } else if (name) {
       // Optional: Update name if they enter a new one during login
-      await supabase.from('merchants').update({ shop_name: name }).eq('phone_number', phone);
+      await sql`
+        UPDATE merchants SET shop_name = ${name} WHERE phone_number = ${phone}
+      `;
     }
 
     // Create an auth session cookie for the dashboard

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { parseDeliveryDetails, parseImageDetails, parseAudioDetails } from '@/lib/gemini';
 import { getTopCouriers, createOrderAndGenerateAWB, CourierOption } from '@/lib/shiprocket';
-import { supabase } from '@/lib/supabase/client';
+import { sql } from '@/lib/db';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -35,11 +35,13 @@ export async function POST(request: Request) {
               const from = message.from; 
               
               // 1. Authenticate Merchant by Caller ID
-              const { data: merchantData } = await supabase
-                .from('merchants')
-                .select('id, shop_name, pickup_pincode')
-                .filter('phone_number', 'ilike', `%${from.slice(-10)}%`) 
-                .single();
+              const fromLast10 = from.slice(-10);
+              const { rows: merchantRows } = await sql`
+                SELECT id, shop_name, pickup_pincode FROM merchants
+                WHERE phone_number LIKE ${'%' + fromLast10 + '%'}
+                LIMIT 1
+              `;
+              const merchantData = merchantRows[0];
 
               if (!merchantData) {
                 console.log(`[Auth Failed] Unknown number: ${from}`);
@@ -67,7 +69,7 @@ export async function POST(request: Request) {
                   const shipmentDetails = await createOrderAndGenerateAWB(orderId, courierId);
 
                   // Update DB
-                  await supabase.from('orders').update({ status: 'dispatched' }).eq('id', orderId);
+                  await sql`UPDATE orders SET status = 'dispatched' WHERE id = ${orderId}`;
                   
                   // Reply with Tracking Link
                   await sendWhatsAppMessage(phone_number_id, from, `✅ Shipment officially booked! The agent will arrive tomorrow.\n\nTrack here: ${shipmentDetails.tracking_url}`);
@@ -114,22 +116,20 @@ export async function POST(request: Request) {
                   parsedData.is_cod || false
                 );
 
-                const { data: orderData, error } = await supabase
-                  .from('orders')
-                  .insert([{
-                    merchant_id: merchantData.id,
-                    customer_name: parsedData.customer_name,
-                    customer_phone: parsedData.customer_phone,
-                    delivery_address: parsedData.delivery_address,
-                    pincode: parsedData.pincode,
-                    is_cod: parsedData.is_cod,
-                    cod_amount: parsedData.cod_amount,
-                    weight_kg: parsedData.weight_kg,
-                    price: couriers[0].price, // Base it on cheapest initially
-                    status: 'pending'
-                  }])
-                  .select()
-                  .single();
+                let orderData = null;
+                let error = null;
+                try {
+                  const { rows } = await sql`
+                    INSERT INTO orders (
+                      merchant_id, customer_name, customer_phone, delivery_address, pincode, is_cod, cod_amount, weight_kg, price, status
+                    ) VALUES (
+                      ${merchantData.id}, ${parsedData.customer_name}, ${parsedData.customer_phone}, ${parsedData.delivery_address}, ${parsedData.pincode}, ${parsedData.is_cod}, ${parsedData.cod_amount}, ${parsedData.weight_kg}, ${couriers[0].price}, 'pending'
+                    ) RETURNING *
+                  `;
+                  orderData = rows[0];
+                } catch (e) {
+                  error = e;
+                }
 
                 if (orderData) {
                   // Send the 3 interactive buttons
@@ -194,9 +194,11 @@ async function downloadWhatsAppMediaToFile(mediaId: string): Promise<string> {
 // Send WhatsApp Message Helper
 async function sendWhatsAppMessage(phone_number_id: string, to: string, text: string) {
   // Record for Simulator
-  const { data: m } = await supabase.from('merchants').select('id').filter('phone_number', 'ilike', `%${to.slice(-10)}%`).single();
+  const toLast10 = to.slice(-10);
+  const { rows } = await sql`SELECT id FROM merchants WHERE phone_number LIKE ${'%' + toLast10 + '%'} LIMIT 1`;
+  const m = rows[0];
   if (m) {
-    await supabase.from('ai_messages').insert([{ merchant_id: m.id, sender: 'ai', text_content: text }]);
+    await sql`INSERT INTO ai_messages (merchant_id, sender, text_content) VALUES (${m.id}, 'ai', ${text})`;
   }
 
   if (process.env.WHATSAPP_TOKEN) {
@@ -238,13 +240,11 @@ async function sendWhatsAppInteractive(phone_number_id: string, to: string, orde
   const optionsText = buttons.map(b => `🔘 ${b.reply.title} |__ID__${b.reply.id}__|`).join('\n');
 
   // Record for Simulator
-  const { data: m } = await supabase.from('merchants').select('id').filter('phone_number', 'ilike', `%${to.slice(-10)}%`).single();
+  const toLast10 = to.slice(-10);
+  const { rows } = await sql`SELECT id FROM merchants WHERE phone_number LIKE ${'%' + toLast10 + '%'} LIMIT 1`;
+  const m = rows[0];
   if (m) {
-    await supabase.from('ai_messages').insert([{ 
-      merchant_id: m.id, 
-      sender: 'ai', 
-      text_content: `${messageText}\n\n${optionsText}` 
-    }]);
+    await sql`INSERT INTO ai_messages (merchant_id, sender, text_content) VALUES (${m.id}, 'ai', ${`${messageText}\n\n${optionsText}`})`;
   }
 
   if (process.env.WHATSAPP_TOKEN) {

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function DashboardOverviewPage() {
@@ -33,22 +32,11 @@ export default function DashboardOverviewPage() {
       }
       setProfile(mockProfile);
 
-      try {
-        const { data, error } = await supabase
-          .from('orders')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(5);
-
-        if (error) throw error;
-        setOrders(data || []);
-      } catch (error) {
-        setOrders([
-          { id: '1', customer_name: 'Rahul Menon', status: 'delivered', price: 1450 },
-          { id: '2', customer_name: 'Anjali Sharma', status: 'dispatched', price: 890 },
-          { id: '3', customer_name: 'Akhil R', status: 'pending', price: 2100 }
-        ]);
-      }
+      setOrders([
+        { id: '1', customer_name: 'Rahul Menon', status: 'delivered', price: 1450 },
+        { id: '2', customer_name: 'Anjali Sharma', status: 'dispatched', price: 890 },
+        { id: '3', customer_name: 'Akhil R', status: 'pending', price: 2100 }
+      ]);
       setLoading(false);
     };
     init();

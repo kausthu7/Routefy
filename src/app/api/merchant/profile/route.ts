@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { supabase } from '@/lib/supabase/client';
+import { sql } from '@/lib/db';
 
 export async function GET() {
   const phone = cookies().get('merchant_session')?.value;
@@ -8,13 +8,15 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data, error } = await supabase
-    .from('merchants')
-    .select('*')
-    .eq('phone_number', phone)
-    .single();
+  let data = null;
+  try {
+    const { rows } = await sql`SELECT * FROM merchants WHERE phone_number = ${phone} LIMIT 1`;
+    data = rows[0];
+  } catch (error) {
+    console.error(error);
+  }
 
-  if (error || !data) {
+  if (!data) {
     // If testing without DB, mock it
     return NextResponse.json({ phone_number: phone, pickup_address: null });
   }
@@ -29,15 +31,21 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { shop_name, pickup_address, pickup_pincode } = await request.json();
+    const { shop_name, pickup_address, pickup_pincode, default_product } = await request.json();
 
-    const { error } = await supabase
-      .from('merchants')
-      .update({ shop_name, pickup_address, pickup_pincode })
-      .eq('phone_number', phone);
-
-    if (error) {
-      console.warn("Supabase update failed, mocking success for local dev:", error);
+    try {
+      await sql`
+        INSERT INTO merchants (phone_number, shop_name, pickup_address, pickup_pincode, default_product)
+        VALUES (${phone}, ${shop_name}, ${pickup_address}, ${pickup_pincode}, ${default_product})
+        ON CONFLICT (phone_number) 
+        DO UPDATE SET 
+          shop_name = EXCLUDED.shop_name,
+          pickup_address = EXCLUDED.pickup_address,
+          pickup_pincode = EXCLUDED.pickup_pincode,
+          default_product = EXCLUDED.default_product
+      `;
+    } catch (error) {
+      console.warn("Postgres update failed, mocking success for local dev:", error);
       // Fallback to mock success for MVP local testing without DB keys
       return NextResponse.json({ success: true, mocked: true });
     }
