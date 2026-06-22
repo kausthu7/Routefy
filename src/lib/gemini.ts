@@ -6,7 +6,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'mock-key');
 
 // Using Flash for maximum speed and cost-efficiency
 const model = genAI.getGenerativeModel({ 
-  model: "gemini-1.5-flash",
+  model: "gemini-pro",
   generationConfig: {
     responseMimeType: "application/json",
   }
@@ -29,23 +29,28 @@ If COD is mentioned, is_cod is true and extract the amount. Otherwise false and 
 
 export async function parseDeliveryDetails(text: string) {
   if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'mock-key') {
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + text }] }],
-    });
-    const responseText = result.response.text();
-    return responseText ? JSON.parse(responseText) : null;
-  } else {
-    console.log("No GEMINI_API_KEY found. Returning mock parsed data for TEXT.");
-    return {
-      customer_name: "Text Customer",
-      customer_phone: "9876543210",
-      delivery_address: text.substring(0, 50),
-      pincode: "110001",
-      is_cod: text.toLowerCase().includes("cod"),
-      cod_amount: text.toLowerCase().includes("cod") ? 500 : null,
-      weight_kg: 1
-    };
+    try {
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + text }] }],
+      });
+      const responseText = result.response.text();
+      return responseText ? JSON.parse(responseText) : null;
+    } catch (error) {
+      console.error("Gemini API Error (Text):", error);
+      // Fall through to mock data
+    }
   }
+  
+  console.log("Using fallback mock data for TEXT.");
+  return {
+    customer_name: "Text Customer",
+    customer_phone: "9876543210",
+    delivery_address: text.substring(0, 50),
+    pincode: "110001",
+    is_cod: text.toLowerCase().includes("cod"),
+    cod_amount: text.toLowerCase().includes("cod") ? 500 : null,
+    weight_kg: 1
+  };
 }
 
 export async function parseImageDetails(base64Image: string) {

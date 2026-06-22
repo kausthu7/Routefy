@@ -61,7 +61,7 @@ export default function DashboardOverviewPage() {
             Show: <span className="text-slate-300">All Shipments</span> <span className="text-xs">▼</span>
           </div>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold py-2 px-5 rounded-lg shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all flex items-center gap-2">
+        <button className="bg-white hover:bg-slate-200 text-black text-sm font-semibold py-2 px-5 rounded-xl shadow-sm transition-all flex items-center gap-2">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
           Generate Report
         </button>
@@ -69,15 +69,13 @@ export default function DashboardOverviewPage() {
 
       {/* Vexel style Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 relative">
-        {/* Glow effect positioned behind the second card as seen in image */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-blue-500/20 rounded-full blur-[100px] pointer-events-none z-[-1]" />
-        
+
         <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36">
           <p className="text-sm font-bold text-slate-300">Number of Orders</p>
           <div>
             <div className="flex items-baseline gap-3 mb-1">
-              <span className="text-3xl font-extrabold text-white tracking-tight">1,248</span>
-              <span className="text-sm font-bold text-green-400 neon-text">+12.5%↑</span>
+              <span className="text-3xl font-semibold text-white tracking-tight">1,248</span>
+              <span className="text-sm font-medium text-emerald-400">+12.5%↑</span>
             </div>
             <p className="text-xs text-slate-500 font-medium">Compared to (1,109 last month)</p>
           </div>
@@ -88,8 +86,8 @@ export default function DashboardOverviewPage() {
           <p className="text-sm font-bold text-slate-300 relative z-10">Shipping Spent</p>
           <div className="relative z-10">
             <div className="flex items-baseline gap-3 mb-1">
-              <span className="text-3xl font-extrabold text-white tracking-tight">₹20,199</span>
-              <span className="text-sm font-bold text-green-400 neon-text">+0.5%↑</span>
+              <span className="text-3xl font-semibold text-white tracking-tight">₹20,199</span>
+              <span className="text-sm font-medium text-emerald-400">+0.5%↑</span>
             </div>
             <p className="text-xs text-slate-500 font-medium">Compared to (₹19,000 last month)</p>
           </div>
@@ -99,8 +97,8 @@ export default function DashboardOverviewPage() {
           <p className="text-sm font-bold text-slate-300">Return / RTO Cost</p>
           <div>
             <div className="flex items-baseline gap-3 mb-1">
-              <span className="text-3xl font-extrabold text-white tracking-tight">₹4,110</span>
-              <span className="text-sm font-bold text-red-500 text-shadow-[0_0_10px_rgba(239,68,68,0.5)]">-1.5%↓</span>
+              <span className="text-3xl font-semibold text-white tracking-tight">₹4,110</span>
+              <span className="text-sm font-medium text-rose-400">-1.5%↓</span>
             </div>
             <p className="text-xs text-slate-500 font-medium">Compared to (₹4,165 last month)</p>
           </div>
@@ -111,7 +109,7 @@ export default function DashboardOverviewPage() {
           <p className="text-sm font-bold text-slate-300 relative z-10">Wallet Balance</p>
           <div className="relative z-10">
             <div className="flex items-baseline gap-3 mb-1">
-              <span className="text-3xl font-extrabold text-white tracking-tight">₹1,422</span>
+              <span className="text-3xl font-semibold text-white tracking-tight">₹1,422</span>
             </div>
             <p className="text-xs text-slate-500 font-medium">Available for prepaid shipping</p>
           </div>
@@ -154,8 +152,8 @@ export default function DashboardOverviewPage() {
 
             {/* Mock CSS SVG Chart lines */}
             <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
-               <path d="M0,80 Q10,70 20,90 T40,60 T60,80 T80,30 T100,50" fill="none" stroke="#3b82f6" strokeWidth="1.5" className="drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
-               <path d="M0,95 Q15,85 25,95 T45,75 T65,90 T85,50 T100,80" fill="none" stroke="#22c55e" strokeWidth="1.5" className="drop-shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+               <path d="M0,80 Q10,70 20,90 T40,60 T60,80 T80,30 T100,50" fill="none" stroke="#3b82f6" strokeWidth="1.5" />
+               <path d="M0,95 Q15,85 25,95 T45,75 T65,90 T85,50 T100,80" fill="none" stroke="#22c55e" strokeWidth="1.5" />
             </svg>
 
             {/* Mock Tooltip overlay exactly as in Vexel image */}
