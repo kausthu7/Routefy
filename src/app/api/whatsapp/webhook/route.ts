@@ -9,6 +9,8 @@ import os from 'os';
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || 'mock-verify-token';
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN || 'mock-whatsapp-token';
 
+export const maxDuration = 60; // Allow Vercel to run for up to 60 seconds instead of the default 10s timeout
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const mode = url.searchParams.get('hub.mode');
