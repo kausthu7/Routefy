@@ -202,7 +202,7 @@ async function sendWhatsAppMessage(phone_number_id: string, to: string, text: st
   }
 
   if (process.env.WHATSAPP_TOKEN) {
-    await fetch(`https://graph.facebook.com/v17.0/${phone_number_id}/messages`, {
+    const res = await fetch(`https://graph.facebook.com/v17.0/${phone_number_id}/messages`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
@@ -214,6 +214,8 @@ async function sendWhatsAppMessage(phone_number_id: string, to: string, text: st
         text: { body: text }
       })
     });
+    const resData = await res.json();
+    console.log(`[Meta API] Sent message to ${to}. Response:`, resData);
   } else {
     console.log(`[Mock WhatsApp] To: ${to} | Message: ${text}`);
   }

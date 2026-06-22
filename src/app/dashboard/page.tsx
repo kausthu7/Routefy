@@ -72,7 +72,7 @@ export default function DashboardOverviewPage() {
         {/* Glow effect positioned behind the second card as seen in image */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-blue-500/20 rounded-full blur-[100px] pointer-events-none z-[-1]" />
         
-        <div className="glass-card rounded-2xl p-6 flex flex-col justify-between h-36">
+        <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36">
           <p className="text-sm font-bold text-slate-300">Number of Orders</p>
           <div>
             <div className="flex items-baseline gap-3 mb-1">
@@ -83,7 +83,7 @@ export default function DashboardOverviewPage() {
           </div>
         </div>
 
-        <div className="glass-card rounded-2xl p-6 flex flex-col justify-between h-36 border border-blue-500/30 relative overflow-hidden">
+        <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36 border border-blue-500/30 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
           <p className="text-sm font-bold text-slate-300 relative z-10">Shipping Spent</p>
           <div className="relative z-10">
@@ -95,7 +95,7 @@ export default function DashboardOverviewPage() {
           </div>
         </div>
 
-        <div className="glass-card rounded-2xl p-6 flex flex-col justify-between h-36">
+        <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36">
           <p className="text-sm font-bold text-slate-300">Return / RTO Cost</p>
           <div>
             <div className="flex items-baseline gap-3 mb-1">
@@ -106,7 +106,7 @@ export default function DashboardOverviewPage() {
           </div>
         </div>
 
-        <div className="glass-card rounded-2xl p-6 flex flex-col justify-between h-36 border border-blue-500/30 relative overflow-hidden">
+        <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36 border border-blue-500/30 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
           <p className="text-sm font-bold text-slate-300 relative z-10">Wallet Balance</p>
           <div className="relative z-10">
@@ -123,7 +123,7 @@ export default function DashboardOverviewPage() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-8">
         
         {/* Shipping Volume Mock Chart Area */}
-        <div className="glass-card rounded-2xl p-6 xl:col-span-2 min-h-[400px] flex flex-col">
+        <div className="spatial-panel rounded-3xl p-6 xl:col-span-2 min-h-[400px] flex flex-col">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-sm font-bold text-slate-300">Shipping Volume</h3>
             <div className="flex items-center gap-6">
@@ -171,7 +171,7 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* Recent Shipments List (Modified to match Vexel dark theme) */}
-        <div className="glass-card rounded-2xl p-0 flex flex-col overflow-hidden">
+        <div className="spatial-panel rounded-3xl p-0 flex flex-col overflow-hidden">
           <div className="p-6 border-b border-slate-800/50">
              <h3 className="text-sm font-bold text-slate-300">Recent Shipments</h3>
           </div>

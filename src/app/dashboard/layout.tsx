@@ -53,53 +53,47 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className="min-h-screen text-slate-200 flex flex-col md:flex-row font-sans bg-transparent relative">
+    <div className="min-h-screen text-slate-200 flex flex-col md:flex-row font-sans bg-transparent relative p-4 md:p-6 gap-6">
 
-      {/* Motion Background Video */}
-      <div className="fixed inset-0 z-[-10] bg-black">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover opacity-50"
-        >
-          <source src="/bg-video.mp4" type="video/mp4" />
-        </video>
-        {/* Fallback dark overlay to ensure text remains readable */}
-        <div className="absolute inset-0 bg-[#030712]/70" />
+      {/* Spatial Motion Background */}
+      <div className="fixed inset-0 z-[-10] bg-slate-950 overflow-hidden">
+        {/* Colorful glowing orbs for refraction */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/30 blur-[120px] rounded-full mix-blend-screen animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/30 blur-[120px] rounded-full mix-blend-screen animate-pulse delay-1000" />
+        <div className="absolute top-[40%] left-[60%] w-[40%] h-[40%] bg-emerald-600/20 blur-[120px] rounded-full mix-blend-screen animate-pulse delay-500" />
+        <div className="absolute inset-0 bg-[#030712]/60 backdrop-blur-[100px]" />
       </div>
 
       {/* Mobile Top Header */}
-      <header className="md:hidden flex items-center justify-between px-4 h-16 sidebar-glass border-b border-white/5 sticky top-0 z-40">
+      <header className="md:hidden flex items-center justify-between px-6 py-4 spatial-panel rounded-3xl sticky top-4 z-40">
         <RoutefyLogo iconSize="w-8 h-8" textSize="text-2xl" />
         <div className="flex items-center gap-2 font-medium text-slate-300">
-          <Wallet className="w-4 h-4 text-blue-500" />
+          <Wallet className="w-4 h-4 text-blue-400" />
           ₹1,422
         </div>
       </header>
 
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 flex-col sidebar-glass border-r border-white/5 sticky top-0 h-screen overflow-y-auto shrink-0 z-40 shadow-2xl">
-        <div className="p-6 flex items-center justify-center">
+      {/* Desktop Floating Sidebar */}
+      <aside className="hidden md:flex w-72 flex-col spatial-panel rounded-3xl sticky top-6 h-[calc(100vh-48px)] overflow-y-auto shrink-0 z-40">
+        <div className="p-8 flex items-center justify-center border-b border-white/5">
            <RoutefyLogo />
         </div>
 
-        <div className="px-6 pb-6">
-          <div className="text-[10px] font-bold text-slate-500 tracking-[0.2em] mb-4 uppercase">Main</div>
-          <nav className="space-y-1.5">
+        <div className="p-6 flex-1">
+          <div className="text-xs font-bold text-slate-400 tracking-[0.2em] mb-4 uppercase ml-2">Main Menu</div>
+          <nav className="space-y-2">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
-                    ? 'bg-blue-500/10 text-white shadow-[inset_2px_0_0_0_#3b82f6]'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                  className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl text-sm font-medium transition-all ${isActive
+                    ? 'bg-white/10 text-white shadow-[0_0_20px_rgba(255,255,255,0.1)] border border-white/10'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
                     }`}
                 >
-                  <item.icon className={`w-5 h-5 ${isActive ? 'text-blue-400' : 'text-slate-500'}`} />
+                  <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                   {item.name}
                 </Link>
               );
@@ -107,60 +101,61 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
         </div>
 
-        <div className="mt-auto p-6 border-t border-white/5">
-          <div className="text-[10px] font-bold text-slate-500 tracking-[0.2em] mb-4 uppercase">Help</div>
+        <div className="p-6 border-t border-white/5 mt-auto">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-4 px-4 py-3 w-full text-left rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+            className="flex items-center gap-4 px-5 py-3.5 w-full text-left rounded-2xl text-sm font-medium text-slate-400 hover:text-white hover:bg-red-500/10 hover:border-red-500/20 border border-transparent transition-all"
           >
-            <LogOut className="w-5 h-5 text-slate-500" />
+            <LogOut className="w-5 h-5" />
             Sign Out
           </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 pb-20 md:pb-0 overflow-y-auto min-h-screen relative">
-        {/* Topbar Search (Desktop) */}
-        <header className="hidden md:flex items-center justify-between px-8 h-20 sticky top-0 z-30 sidebar-glass border-b border-white/5 border-r-0">
-          <div className="flex items-center gap-3 text-slate-400 w-96 bg-white/5 px-4 py-2.5 rounded-full border border-white/5 focus-within:border-blue-500/50 focus-within:bg-white/10 transition-all shadow-inner">
-            <span className="text-slate-500 text-sm">🔍</span>
-            <input type="text" placeholder="Search..." className="bg-transparent border-0 focus:ring-0 text-sm w-full text-slate-200 placeholder:text-slate-500 outline-none" />
+      <main className="flex-1 pb-24 md:pb-0 min-h-[calc(100vh-48px)] relative flex flex-col gap-6">
+        {/* Desktop Topbar */}
+        <header className="hidden md:flex items-center justify-between px-8 py-4 sticky top-6 z-30 spatial-panel rounded-3xl h-20">
+          <div className="flex items-center gap-3 text-slate-400 w-96 bg-black/20 px-5 py-3 rounded-2xl border border-white/5 focus-within:border-white/20 focus-within:bg-black/40 transition-all shadow-inner">
+            <span className="text-slate-400 text-sm">🔍</span>
+            <input type="text" placeholder="Search orders, tracking..." className="bg-transparent border-0 focus:ring-0 text-sm w-full text-slate-200 placeholder:text-slate-500 outline-none" />
           </div>
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-300 relative border border-white/5 shadow-sm">
+            <button className="w-12 h-12 rounded-2xl spatial-button flex items-center justify-center text-slate-300 relative group">
               🔔
-              <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0A0E17]"></span>
-            </div>
-            <div className="flex items-center gap-3 bg-white/5 py-1.5 px-3 rounded-full border border-white/5 cursor-pointer hover:bg-white/10 transition-colors shadow-sm">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-emerald-400 p-[1px]">
-                <div className="w-full h-full bg-[#0A0E17] rounded-full flex items-center justify-center text-xs font-bold">RM</div>
+              <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-slate-900 group-hover:scale-110 transition-transform"></span>
+            </button>
+            <div className="flex items-center gap-4 spatial-button py-2 px-3 rounded-2xl cursor-pointer">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-inner">
+                <span className="text-white text-xs font-bold tracking-wider">RM</span>
               </div>
               <div className="flex flex-col pr-2">
-                <span className="text-xs font-bold text-white leading-none mb-1">Routefy Merchant</span>
-                <span className="text-[10px] text-slate-400 leading-none">Administrator</span>
+                <span className="text-sm font-bold text-white leading-none mb-1">Routefy Merchant</span>
+                <span className="text-[10px] text-slate-400 leading-none uppercase tracking-wider">Pro Plan</span>
               </div>
-              <span className="text-slate-500 text-xs">▼</span>
             </div>
           </div>
         </header>
 
-        {children}
+        {/* Content Wrapper */}
+        <div className="flex-1 spatial-panel rounded-3xl overflow-hidden relative">
+          {children}
+        </div>
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 sidebar-glass border-t border-white/5 flex items-center justify-around z-50 px-2">
+      <nav className="md:hidden fixed bottom-4 left-4 right-4 spatial-panel rounded-3xl flex items-center justify-around z-50 p-2">
         {navItems.filter(i => ['Overview', 'Orders', 'Wallet', 'Settings'].includes(i.name)).map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.name}
               href={item.href}
-              className={`flex flex-col items-center justify-center w-full h-full gap-1 ${isActive ? 'text-blue-400' : 'text-slate-500'
+              className={`flex flex-col items-center justify-center p-3 rounded-2xl gap-1.5 transition-all ${isActive ? 'bg-white/10 text-white shadow-inner' : 'text-slate-400 hover:bg-white/5'
                 }`}
             >
-              <item.icon className={`w-5 h-5 ${isActive ? 'fill-blue-500/20' : ''}`} />
-              <span className="text-[10px] font-medium">{item.name === 'AI Inbox' ? 'AI' : item.name}</span>
+              <item.icon className="w-5 h-5" />
+              <span className="text-[10px] font-medium tracking-wide">{item.name === 'Simulator' ? 'AI' : item.name}</span>
             </Link>
           );
         })}

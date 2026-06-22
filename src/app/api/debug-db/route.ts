@@ -1,20 +1,19 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 
-export async function GET() {
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: Request) {
   try {
-    const result = await sql`
-      INSERT INTO merchants (phone_number, shop_name, pickup_address, pickup_pincode, default_product)
-      VALUES ('1234567890', 'Test Shop', 'Test Address', '123456', '[]')
-      ON CONFLICT (phone_number) 
-      DO UPDATE SET 
-        shop_name = EXCLUDED.shop_name,
-        pickup_address = EXCLUDED.pickup_address,
-        pickup_pincode = EXCLUDED.pickup_pincode,
-        default_product = EXCLUDED.default_product
-      RETURNING *;
-    `;
-    return NextResponse.json({ success: true, result });
+    const { rows: merchants } = await sql`SELECT * FROM merchants`;
+    const { rows: ai_messages } = await sql`SELECT * FROM ai_messages ORDER BY created_at DESC LIMIT 10`;
+    return NextResponse.json({ 
+      success: true, 
+      postgresUrl: process.env.POSTGRES_URL,
+      whatsappToken: process.env.WHATSAPP_TOKEN,
+      merchants, 
+      ai_messages 
+    });
   } catch (error) {
     return NextResponse.json({ success: false, error: String(error) });
   }

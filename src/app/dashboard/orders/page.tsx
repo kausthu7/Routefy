@@ -46,7 +46,7 @@ export default function OrdersPage() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1 glass-card p-1 rounded-full overflow-hidden">
+        <div className="relative flex-1 spatial-panel p-1 rounded-full overflow-hidden">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
           <Input 
             placeholder="Search customer, phone or tracking..." 
@@ -76,7 +76,7 @@ export default function OrdersPage() {
       {loading ? (
         <div className="py-24 text-center text-slate-500 font-medium">Loading orders...</div>
       ) : filteredOrders.length === 0 ? (
-        <div className="glass-card rounded-2xl border-dashed border-2 border-slate-700 bg-white/5 shadow-none">
+        <div className="spatial-panel rounded-3xl border-dashed border-2 border-slate-700 bg-white/5 shadow-none">
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="w-20 h-20 bg-white/5 shadow-inner border border-white/10 rounded-full flex items-center justify-center mb-4 text-slate-400">
               <Search className="w-8 h-8" />
@@ -88,7 +88,7 @@ export default function OrdersPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredOrders.map(order => (
-            <div key={order.id} className="glass-card rounded-2xl group flex flex-col h-full relative">
+            <div key={order.id} className="spatial-panel rounded-3xl group flex flex-col h-full relative">
               <div className="p-6 flex-1">
                 <div className="flex items-start justify-between mb-6">
                   <div className="pr-2">
@@ -133,7 +133,7 @@ export default function OrdersPage() {
                 </div>
               </div>
 
-              <div className="bg-[#0A0E17]/60 p-5 border-t border-white/5 flex items-center justify-between mt-auto rounded-b-2xl">
+              <div className="bg-[#0A0E17]/60 p-5 border-t border-white/5 flex items-center justify-between mt-auto rounded-b-3xl">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white/5 rounded-lg border border-white/10">
                     <Truck className="w-4 h-4 text-slate-400" />
