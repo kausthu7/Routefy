@@ -1,4 +1,16 @@
-import { sql } from '@vercel/postgres';
+import { Pool } from 'pg';
+
+const pool = new Pool({
+  connectionString: process.env.POSTGRES_URL,
+});
+
+export async function sql(strings: TemplateStringsArray, ...values: any[]) {
+  let text = strings[0];
+  for (let i = 1; i < strings.length; i++) {
+    text += '$' + i + strings[i];
+  }
+  return pool.query(text, values);
+}
 
 export async function initializeDatabase() {
   try {
@@ -55,5 +67,3 @@ export async function initializeDatabase() {
   }
 }
 
-// Re-export sql for convenience
-export { sql };
