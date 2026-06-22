@@ -140,52 +140,55 @@ export default function DashboardOverviewPage() {
         </div>
       )}
 
-      {/* Vexel style Metric Cards - Only show if not empty state */}
-      {!isNewAccount && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 relative">
-          <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36">
-            <p className="text-sm font-bold text-slate-300">Number of Orders</p>
-            <div>
-              <div className="flex items-baseline gap-3 mb-1">
-                <span className="text-3xl font-semibold text-white tracking-tight">{totalOrders}</span>
-              </div>
-              <p className="text-xs text-slate-500 font-medium">{ordersToday} {ordersToday === 1 ? 'order' : 'orders'} today</p>
+      {/* Vexel style Metric Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 relative">
+        <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36">
+          <p className="text-sm font-bold text-slate-300">Number of Orders</p>
+          <div>
+            <div className="flex items-baseline gap-3 mb-1">
+              <span className="text-3xl font-semibold text-white tracking-tight">{totalOrders}</span>
             </div>
-          </div>
-
-          <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36 border border-blue-500/30 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
-            <p className="text-sm font-bold text-slate-300 relative z-10">Shipping Spent</p>
-            <div className="relative z-10">
-              <div className="flex items-baseline gap-3 mb-1">
-                <span className="text-3xl font-semibold text-white tracking-tight">₹{formattedSpent}</span>
-              </div>
-              <p className="text-xs text-slate-500 font-medium">Total shipping cost</p>
-            </div>
-          </div>
-
-          <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36">
-            <p className="text-sm font-bold text-slate-300">Return / RTO Cost</p>
-            <div>
-              <div className="flex items-baseline gap-3 mb-1">
-                <span className="text-3xl font-semibold text-white tracking-tight">₹0</span>
-              </div>
-              <p className="text-xs text-slate-500 font-medium">No returns yet</p>
-            </div>
-          </div>
-
-          <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36 border border-blue-500/30 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
-            <p className="text-sm font-bold text-slate-300 relative z-10">Wallet Balance</p>
-            <div className="relative z-10">
-              <div className="flex items-baseline gap-3 mb-1">
-                <span className="text-3xl font-semibold text-white tracking-tight">₹0</span>
-              </div>
-              <p className="text-xs text-slate-500 font-medium">Add funds in Shiprocket</p>
-            </div>
+            <p className="text-xs text-slate-500 font-medium">{ordersToday} {ordersToday === 1 ? 'order' : 'orders'} today</p>
           </div>
         </div>
-      )}
+
+        <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36 border border-blue-500/30 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
+          <p className="text-sm font-bold text-slate-300 relative z-10">Shipping Spent</p>
+          <div className="relative z-10">
+            <div className="flex items-baseline gap-3 mb-1">
+              <span className="text-3xl font-semibold text-white tracking-tight">₹{formattedSpent}</span>
+            </div>
+            <p className="text-xs text-slate-500 font-medium">Total shipping cost</p>
+          </div>
+        </div>
+
+        <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36">
+          <p className="text-sm font-bold text-slate-300">Return / RTO Cost</p>
+          <div>
+            <div className="flex items-baseline gap-3 mb-1">
+              <span className="text-3xl font-semibold text-white tracking-tight">₹0</span>
+            </div>
+            <p className="text-xs text-slate-500 font-medium">No returns yet</p>
+          </div>
+        </div>
+
+        <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36 border border-blue-500/30 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
+          <div className="flex items-center justify-between relative z-10">
+            <p className="text-sm font-bold text-slate-300">Wallet Balance</p>
+            <button className="text-xs font-bold text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 px-2 py-1 rounded-md transition-colors" onClick={() => window.open('https://app.shiprocket.in/billing/recharge', '_blank')}>
+              + Add Funds
+            </button>
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-baseline gap-3 mb-1">
+              <span className="text-3xl font-semibold text-white tracking-tight">₹0</span>
+            </div>
+            <p className="text-xs text-slate-500 font-medium">Prepaid balance</p>
+          </div>
+        </div>
+      </div>
 
       {/* Chart & Data Area */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-8">
