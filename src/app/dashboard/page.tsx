@@ -90,6 +90,23 @@ export default function DashboardOverviewPage() {
   const shippingSpent = orders.reduce((acc, o) => acc + (parseFloat(o.price) || 0), 0);
   const formattedSpent = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(shippingSpent);
 
+  const todayStr = new Date().toISOString().split('T')[0];
+  const ordersToday = orders.filter(o => o.created_at && o.created_at.startsWith(todayStr)).length;
+  
+  const isNewAccount = totalOrders <= 1;
+
+  // Status color mapper
+  const getStatusBadge = (status: string) => {
+    switch(status?.toLowerCase()) {
+      case 'delivered':
+        return <Badge className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20">{status}</Badge>;
+      case 'dispatched':
+        return <Badge className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/20">{status}</Badge>;
+      default:
+        return <Badge className="bg-slate-500/10 text-slate-400 hover:bg-slate-500/20 border-slate-500/20">{status}</Badge>;
+    }
+  };
+
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 relative z-10">
       
@@ -97,68 +114,84 @@ export default function DashboardOverviewPage() {
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold text-white tracking-wide">Overview</h1>
-          <div className="text-sm font-medium text-slate-500 flex items-center gap-2 cursor-pointer hover:text-slate-300 transition-colors">
-            Show: <span className="text-slate-300">All Shipments</span> <span className="text-xs">▼</span>
-          </div>
+          {!isNewAccount && (
+            <div className="text-sm font-medium text-slate-500 flex items-center gap-2 cursor-pointer hover:text-slate-300 transition-colors">
+              Show: <span className="text-slate-300">All Shipments</span> <span className="text-xs">▼</span>
+            </div>
+          )}
         </div>
-        <button className="bg-white hover:bg-slate-200 text-black text-sm font-semibold py-2 px-5 rounded-xl shadow-sm transition-all flex items-center gap-2">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          Generate Report
-        </button>
+        {!isNewAccount && (
+          <button className="bg-white hover:bg-slate-200 text-black text-sm font-semibold py-2 px-5 rounded-xl shadow-sm transition-all flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            Generate Report
+          </button>
+        )}
       </div>
 
-      {/* Vexel style Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 relative">
-
-        <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36">
-          <p className="text-sm font-bold text-slate-300">Number of Orders</p>
+      {isNewAccount && (
+        <div className="mb-8 p-6 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center gap-4">
+          <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center text-blue-400">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+          </div>
           <div>
-            <div className="flex items-baseline gap-3 mb-1">
-              <span className="text-3xl font-semibold text-white tracking-tight">{totalOrders}</span>
-            </div>
-            <p className="text-xs text-slate-500 font-medium">All time orders</p>
+            <h2 className="text-lg font-bold text-white">Welcome to Routefy! 🎉</h2>
+            <p className="text-sm text-slate-400">Here is your very first order. Send more shipments on WhatsApp to see your volume grow.</p>
           </div>
         </div>
+      )}
 
-        <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36 border border-blue-500/30 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
-          <p className="text-sm font-bold text-slate-300 relative z-10">Shipping Spent</p>
-          <div className="relative z-10">
-            <div className="flex items-baseline gap-3 mb-1">
-              <span className="text-3xl font-semibold text-white tracking-tight">₹{formattedSpent}</span>
+      {/* Vexel style Metric Cards - Only show if not empty state */}
+      {!isNewAccount && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 relative">
+          <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36">
+            <p className="text-sm font-bold text-slate-300">Number of Orders</p>
+            <div>
+              <div className="flex items-baseline gap-3 mb-1">
+                <span className="text-3xl font-semibold text-white tracking-tight">{totalOrders}</span>
+              </div>
+              <p className="text-xs text-slate-500 font-medium">{ordersToday} {ordersToday === 1 ? 'order' : 'orders'} today</p>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Total shipping cost</p>
+          </div>
+
+          <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36 border border-blue-500/30 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
+            <p className="text-sm font-bold text-slate-300 relative z-10">Shipping Spent</p>
+            <div className="relative z-10">
+              <div className="flex items-baseline gap-3 mb-1">
+                <span className="text-3xl font-semibold text-white tracking-tight">₹{formattedSpent}</span>
+              </div>
+              <p className="text-xs text-slate-500 font-medium">Total shipping cost</p>
+            </div>
+          </div>
+
+          <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36">
+            <p className="text-sm font-bold text-slate-300">Return / RTO Cost</p>
+            <div>
+              <div className="flex items-baseline gap-3 mb-1">
+                <span className="text-3xl font-semibold text-white tracking-tight">₹0</span>
+              </div>
+              <p className="text-xs text-slate-500 font-medium">No returns yet</p>
+            </div>
+          </div>
+
+          <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36 border border-blue-500/30 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
+            <p className="text-sm font-bold text-slate-300 relative z-10">Wallet Balance</p>
+            <div className="relative z-10">
+              <div className="flex items-baseline gap-3 mb-1">
+                <span className="text-3xl font-semibold text-white tracking-tight">₹0</span>
+              </div>
+              <p className="text-xs text-slate-500 font-medium">Add funds in Shiprocket</p>
+            </div>
           </div>
         </div>
-
-        <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36">
-          <p className="text-sm font-bold text-slate-300">Return / RTO Cost</p>
-          <div>
-            <div className="flex items-baseline gap-3 mb-1">
-              <span className="text-3xl font-semibold text-white tracking-tight">₹0</span>
-            </div>
-            <p className="text-xs text-slate-500 font-medium">No returns yet</p>
-          </div>
-        </div>
-
-        <div className="spatial-panel rounded-3xl p-6 flex flex-col justify-between h-36 border border-blue-500/30 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
-          <p className="text-sm font-bold text-slate-300 relative z-10">Wallet Balance</p>
-          <div className="relative z-10">
-            <div className="flex items-baseline gap-3 mb-1">
-              <span className="text-3xl font-semibold text-white tracking-tight">₹0</span>
-            </div>
-            <p className="text-xs text-slate-500 font-medium">Add funds in Shiprocket</p>
-          </div>
-        </div>
-
-      </div>
+      )}
 
       {/* Chart & Data Area */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-8">
         
         {/* Shipping Volume Mock Chart Area */}
-        <div className="spatial-panel rounded-3xl p-6 xl:col-span-2 min-h-[400px] flex flex-col">
+        <div className={`spatial-panel rounded-3xl p-6 xl:col-span-2 flex flex-col ${isNewAccount ? 'min-h-[200px]' : 'min-h-[400px]'}`}>
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-sm font-bold text-slate-300">Shipping Volume</h3>
             <div className="flex items-center gap-6">
@@ -171,7 +204,7 @@ export default function DashboardOverviewPage() {
             </div>
           </div>
           
-          <div className="flex-1 mt-4 h-[300px]">
+          <div className={`flex-1 mt-4 ${isNewAccount ? 'h-[100px]' : 'h-[300px]'}`}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={getChartData()} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -185,14 +218,14 @@ export default function DashboardOverviewPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="displayDate" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
-                <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val}`} />
+                <XAxis dataKey="displayDate" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} hide={isNewAccount} />
+                <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val}`} hide={isNewAccount} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#1A2235', borderColor: '#334155', borderRadius: '8px' }}
                   itemStyle={{ color: '#fff', fontSize: '12px' }}
                 />
-                <Area type="monotone" dataKey="Prepaid" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorPrepaid)" />
-                <Area type="monotone" dataKey="COD" stroke="#22c55e" strokeWidth={2} fillOpacity={1} fill="url(#colorCod)" />
+                <Area type="monotone" dataKey="Prepaid" stroke="#3b82f6" strokeWidth={isNewAccount ? 1 : 2} fillOpacity={1} fill="url(#colorPrepaid)" />
+                <Area type="monotone" dataKey="COD" stroke="#22c55e" strokeWidth={isNewAccount ? 1 : 2} fillOpacity={1} fill="url(#colorCod)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -212,13 +245,18 @@ export default function DashboardOverviewPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {orders.length === 0 && (
+                  <TableRow>
+                     <TableCell colSpan={2} className="text-center py-8 text-slate-500">No shipments yet</TableCell>
+                  </TableRow>
+                )}
                 {orders.map((order) => (
                   <TableRow key={order.id} className="border-b border-slate-800/30 hover:bg-slate-800/20 transition-colors">
                     <TableCell className="py-4 px-4">
                       <div className="font-bold text-slate-200">{order.customer_name || 'N/A'}</div>
-                      <div className="text-[10px] text-slate-500 uppercase tracking-widest mt-1 font-semibold">{order.status}</div>
+                      <div className="mt-2">{getStatusBadge(order.status)}</div>
                     </TableCell>
-                    <TableCell className="text-right py-4 px-4">
+                    <TableCell className="text-right py-4 px-4 align-top">
                       <div className="font-bold text-white">₹{order.price || '0.00'}</div>
                     </TableCell>
                   </TableRow>
