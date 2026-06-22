@@ -4,15 +4,60 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Wallet, Plus, IndianRupee, ArrowUpRight, ArrowDownRight, CheckCircle2 } from 'lucide-react';
 
+import { useEffect, useState } from 'react';
+
 export default function WalletPage() {
-  
-  const transactions = [
-    { id: 1, date: 'Today, 10:42 AM', type: 'Shipment Deduction', ref: 'RTF83921', amount: -78, status: 'success' },
-    { id: 2, date: 'Today, 09:15 AM', type: 'Shipment Deduction', ref: 'RTF83920', amount: -112, status: 'success' },
-    { id: 3, date: 'Yesterday, 04:30 PM', type: 'Wallet Topup', ref: 'UPI/123456789', amount: 1000, status: 'success' },
-    { id: 4, date: '16 Jun, 11:20 AM', type: 'Shipment Deduction', ref: 'RTF83850', amount: -65, status: 'success' },
-    { id: 5, date: '15 Jun, 02:10 PM', type: 'Wallet Topup', ref: 'UPI/987654321', amount: 2000, status: 'success' },
-  ];
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [balance, setBalance] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const orderRes = await fetch('/api/merchant/orders');
+        if (orderRes.ok) {
+          const orderData = await orderRes.json();
+          
+          let totalSpent = 0;
+          const mappedTxs = orderData.filter((o: any) => o.price && parseFloat(o.price) > 0).map((order: any) => {
+            const amount = parseFloat(order.price) || 0;
+            totalSpent += amount;
+            
+            const d = new Date(order.created_at);
+            const dateStr = d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+            return {
+              id: order.id,
+              date: dateStr,
+              type: 'Shipment Deduction',
+              ref: `RTF${order.id.substring(0, 6).toUpperCase()}`,
+              amount: -amount,
+              status: 'success'
+            };
+          });
+
+          // Add a mock topup to show a positive starting balance if they have spend
+          const topupTx = {
+            id: 'topup-1',
+            date: 'Initial Deposit',
+            type: 'Wallet Topup',
+            ref: 'UPI/INITIAL',
+            amount: 5000,
+            status: 'success'
+          };
+          
+          setTransactions([ ...mappedTxs, topupTx ]);
+          setBalance(5000 - totalSpent);
+        }
+      } catch (error) {
+        console.error("Failed to fetch wallet data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500 relative z-10">
@@ -42,7 +87,7 @@ export default function WalletPage() {
               <p className="text-slate-400 text-sm font-bold tracking-widest uppercase mb-2">Current Balance</p>
               <div className="text-5xl font-extrabold tracking-tight text-white flex items-center">
                 <IndianRupee className="w-10 h-10 mr-1 text-slate-300" />
-                1,422.00
+                {loading ? '...' : new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(balance)}
               </div>
             </div>
           </div>
@@ -68,50 +113,54 @@ export default function WalletPage() {
       <div>
         <h2 className="text-xl font-bold text-white mb-4 mt-4 drop-shadow-sm">Transaction History</h2>
         <div className="glass-card rounded-2xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader className="bg-white/5 border-b border-white/10">
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="font-bold text-slate-400 h-14 pl-6">Transaction Details</TableHead>
-                  <TableHead className="font-bold text-slate-400 h-14">Reference</TableHead>
-                  <TableHead className="font-bold text-slate-400 h-14 text-right pr-6">Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {transactions.map((tx) => (
-                  <TableRow key={tx.id} className="hover:bg-white/5 border-b border-white/5 transition-colors">
-                    <TableCell className="py-5 pl-6">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
-                          tx.amount > 0 ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-white/5 text-slate-400 border-white/10'
-                        }`}>
-                          {tx.amount > 0 ? <ArrowDownRight className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
-                        </div>
-                        <div>
-                          <p className="font-bold text-white">{tx.type}</p>
-                          <p className="text-xs font-medium text-slate-400 mt-1">{tx.date}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-xs font-mono font-bold text-slate-400 bg-black/40 px-2.5 py-1.5 rounded-lg border border-white/5">{tx.ref}</span>
-                    </TableCell>
-                    <TableCell className="text-right py-5 pr-6">
-                      <div className="flex flex-col items-end">
-                        <span className={`font-extrabold text-lg ${tx.amount > 0 ? 'text-green-400 neon-text' : 'text-white'}`}>
-                          {tx.amount > 0 ? '+' : ''}₹{Math.abs(tx.amount)}
-                        </span>
-                        <div className="flex items-center text-xs font-bold text-slate-500 mt-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-green-500" />
-                          Success
-                        </div>
-                      </div>
-                    </TableCell>
+          {loading ? (
+            <div className="py-24 text-center text-slate-500 font-medium">Loading ledger...</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-white/5 border-b border-white/10">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="font-bold text-slate-400 h-14 pl-6">Transaction Details</TableHead>
+                    <TableHead className="font-bold text-slate-400 h-14">Reference</TableHead>
+                    <TableHead className="font-bold text-slate-400 h-14 text-right pr-6">Amount</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {transactions.map((tx) => (
+                    <TableRow key={tx.id} className="hover:bg-white/5 border-b border-white/5 transition-colors">
+                      <TableCell className="py-5 pl-6">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
+                            tx.amount > 0 ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-white/5 text-slate-400 border-white/10'
+                          }`}>
+                            {tx.amount > 0 ? <ArrowDownRight className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
+                          </div>
+                          <div>
+                            <p className="font-bold text-white">{tx.type}</p>
+                            <p className="text-xs font-medium text-slate-400 mt-1">{tx.date}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-xs font-mono font-bold text-slate-400 bg-black/40 px-2.5 py-1.5 rounded-lg border border-white/5">{tx.ref}</span>
+                      </TableCell>
+                      <TableCell className="text-right py-5 pr-6">
+                        <div className="flex flex-col items-end">
+                          <span className={`font-extrabold text-lg ${tx.amount > 0 ? 'text-green-400 neon-text' : 'text-white'}`}>
+                            {tx.amount > 0 ? '+' : ''}₹{Math.abs(tx.amount)}
+                          </span>
+                          <div className="flex items-center text-xs font-bold text-slate-500 mt-1">
+                            <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-green-500" />
+                            Success
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </div>
       </div>
 

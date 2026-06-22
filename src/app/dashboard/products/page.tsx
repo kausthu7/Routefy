@@ -43,7 +43,7 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  const handleAddProduct = () => {
+  const handleAddProduct = async () => {
     if (!newProductName.trim()) return;
     setIsSaving(true);
     
@@ -53,28 +53,47 @@ export default function ProductsPage() {
       dimensionsStr = `${newProductLength}x${newProductWidth}x${newProductHeight} cm`;
     }
 
-    // Simulate API save
-    setTimeout(() => {
-      setProducts([
-        ...products, 
-        { 
-          name: newProductName, 
-          weight: newProductWeight || '0.5',
-          dimensions: dimensionsStr
-        }
-      ]);
-      setIsModalOpen(false);
-      setNewProductName('');
-      setNewProductWeight('');
-      setNewProductLength('');
-      setNewProductWidth('');
-      setNewProductHeight('');
-      setIsSaving(false);
-    }, 500);
+    const newProductsArray = [
+      ...products, 
+      { 
+        name: newProductName, 
+        weight: newProductWeight || '0.5',
+        dimensions: dimensionsStr
+      }
+    ];
+
+    try {
+      await fetch('/api/merchant/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ default_product: JSON.stringify(newProductsArray) })
+      });
+      setProducts(newProductsArray);
+    } catch (e) {
+      console.error("Failed to save product", e);
+    }
+
+    setIsModalOpen(false);
+    setNewProductName('');
+    setNewProductWeight('');
+    setNewProductLength('');
+    setNewProductWidth('');
+    setNewProductHeight('');
+    setIsSaving(false);
   };
 
-  const handleDeleteProduct = (indexToDelete: number) => {
-    setProducts(products.filter((_, index) => index !== indexToDelete));
+  const handleDeleteProduct = async (indexToDelete: number) => {
+    const updatedProducts = products.filter((_, index) => index !== indexToDelete);
+    try {
+      await fetch('/api/merchant/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ default_product: JSON.stringify(updatedProducts) })
+      });
+      setProducts(updatedProducts);
+    } catch (e) {
+      console.error("Failed to delete product", e);
+    }
   };
 
   return (

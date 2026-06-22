@@ -16,21 +16,15 @@ export default function SettingsPage() {
   const fetchProfile = async () => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1000);
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
       const res = await fetch('/api/merchant/profile', { signal: controller.signal });
       clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
-        setProfile(data);
+        setProfile(data || { shop_name: '', pickup_address: '', pickup_pincode: '', phone_number: '' });
       }
     } catch (e) {
-      console.warn("Using mock profile due to DB timeout");
-      setProfile({
-        shop_name: 'Routefy Demo Store',
-        pickup_address: 'Bangalore',
-        pickup_pincode: '560001',
-        phone_number: '+91 9876543210' // The merchant's own registered Caller ID
-      });
+      console.warn("Failed to fetch profile from DB", e);
     }
   };
 

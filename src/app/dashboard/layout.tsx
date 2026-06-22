@@ -43,7 +43,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Orders', href: '/dashboard/orders', icon: Package },
     { name: 'Products', href: '/dashboard/products', icon: Boxes },
     { name: 'Wallet', href: '/dashboard/wallet', icon: Wallet },
-    { name: 'Simulator', href: '/dashboard/simulator', icon: MessageSquare },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
 
@@ -155,7 +154,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 }`}
             >
               <item.icon className="w-5 h-5" />
-              <span className="text-[10px] font-medium tracking-wide">{item.name === 'Simulator' ? 'AI' : item.name}</span>
+              <span className="text-[10px] font-medium tracking-wide">{item.name}</span>
             </Link>
           );
         })}
