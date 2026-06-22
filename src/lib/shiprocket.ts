@@ -89,44 +89,43 @@ export async function getTopCouriers(
 
 export async function createOrderAndGenerateAWB(
   orderId: string,
-  courierId: string
+  courierId: string,
+  order: any
 ): Promise<{ tracking_url: string; awb_code: string }> {
   try {
     const token = await getShiprocketToken();
 
-    // NOTE: In a real implementation, you would query your DB for the full order details here.
-    // For this example, we generate a mock standard payload.
     const orderPayload = {
       order_id: `RTFY_${orderId}_${Date.now()}`,
       order_date: new Date().toISOString().split('T')[0],
-      pickup_location: "Primary", // Usually configured in Shiprocket
-      billing_customer_name: "Customer",
+      pickup_location: "Primary", // Configure in Shiprocket Dashboard
+      billing_customer_name: order.customer_name || "Customer",
       billing_last_name: "",
-      billing_address: "Delivery Address",
-      billing_city: "City",
-      billing_pincode: "110001",
-      billing_state: "State",
+      billing_address: order.delivery_address || "Delivery Address",
+      billing_city: "City", // Extracted dynamically in a real app, mock for now
+      billing_pincode: order.pincode || "110001",
+      billing_state: "State", // Extracted dynamically in a real app
       billing_country: "India",
-      billing_email: "test@example.com",
-      billing_phone: "9876543210",
+      billing_email: "test@routefy.com",
+      billing_phone: order.customer_phone || "9876543210",
       shipping_is_billing: true,
       order_items: [
         {
           name: "Item",
           sku: "ITEM-1",
           units: 1,
-          selling_price: 100,
+          selling_price: order.is_cod ? order.cod_amount : 100,
           discount: 0,
           tax: 0,
           hsn: 4412
         }
       ],
-      payment_method: "Prepaid",
-      sub_total: 100,
+      payment_method: order.is_cod ? "COD" : "Prepaid",
+      sub_total: order.is_cod ? order.cod_amount : 100,
       length: 10,
       breadth: 10,
       height: 10,
-      weight: 1
+      weight: parseFloat(order.weight_kg) || 1
     };
 
     console.log(`[Shiprocket] Creating Order ID: ${orderPayload.order_id}`);

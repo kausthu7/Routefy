@@ -67,8 +67,17 @@ export async function POST(request: Request) {
 
                   await sendWhatsAppMessage(phone_number_id, from, "Processing your booking with Shiprocket... ⏳");
                   
-                  // Generate AWB via Shiprocket
-                  const shipmentDetails = await createOrderAndGenerateAWB(orderId, courierId);
+                  // Fetch the real order data from the database
+                  const { rows: orderRows } = await sql`SELECT * FROM orders WHERE id = ${orderId} LIMIT 1`;
+                  const order = orderRows[0];
+                  
+                  if (!order) {
+                    await sendWhatsAppMessage(phone_number_id, from, "❌ Error: Order not found in database.");
+                    continue;
+                  }
+
+                  // Generate AWB via Shiprocket using real data
+                  const shipmentDetails = await createOrderAndGenerateAWB(orderId, courierId, order);
 
                   // Update DB
                   await sql`UPDATE orders SET status = 'dispatched' WHERE id = ${orderId}`;

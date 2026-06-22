@@ -16,7 +16,7 @@ export default function DashboardOverviewPage() {
       let mockProfile = { shop_name: 'Routefy Demo Store', pickup_address: 'Bangalore' };
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 1000);
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
         const res = await fetch('/api/merchant/profile', { signal: controller.signal });
         clearTimeout(timeoutId);
         if (res.ok) {
@@ -32,11 +32,16 @@ export default function DashboardOverviewPage() {
       }
       setProfile(mockProfile);
 
-      setOrders([
-        { id: '1', customer_name: 'Rahul Menon', status: 'delivered', price: 1450 },
-        { id: '2', customer_name: 'Anjali Sharma', status: 'dispatched', price: 890 },
-        { id: '3', customer_name: 'Akhil R', status: 'pending', price: 2100 }
-      ]);
+      try {
+        const orderRes = await fetch('/api/merchant/orders');
+        if (orderRes.ok) {
+          const orderData = await orderRes.json();
+          setOrders(orderData);
+        }
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+      }
+
       setLoading(false);
     };
     init();
@@ -49,6 +54,10 @@ export default function DashboardOverviewPage() {
       </div>
     );
   }
+
+  const totalOrders = orders.length;
+  const shippingSpent = orders.reduce((acc, o) => acc + (parseFloat(o.price) || 0), 0);
+  const formattedSpent = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(shippingSpent);
 
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 relative z-10">
@@ -74,10 +83,9 @@ export default function DashboardOverviewPage() {
           <p className="text-sm font-bold text-slate-300">Number of Orders</p>
           <div>
             <div className="flex items-baseline gap-3 mb-1">
-              <span className="text-3xl font-semibold text-white tracking-tight">1,248</span>
-              <span className="text-sm font-medium text-emerald-400">+12.5%↑</span>
+              <span className="text-3xl font-semibold text-white tracking-tight">{totalOrders}</span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Compared to (1,109 last month)</p>
+            <p className="text-xs text-slate-500 font-medium">All time orders</p>
           </div>
         </div>
 
@@ -86,10 +94,9 @@ export default function DashboardOverviewPage() {
           <p className="text-sm font-bold text-slate-300 relative z-10">Shipping Spent</p>
           <div className="relative z-10">
             <div className="flex items-baseline gap-3 mb-1">
-              <span className="text-3xl font-semibold text-white tracking-tight">₹20,199</span>
-              <span className="text-sm font-medium text-emerald-400">+0.5%↑</span>
+              <span className="text-3xl font-semibold text-white tracking-tight">₹{formattedSpent}</span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Compared to (₹19,000 last month)</p>
+            <p className="text-xs text-slate-500 font-medium">Total shipping cost</p>
           </div>
         </div>
 
@@ -97,10 +104,9 @@ export default function DashboardOverviewPage() {
           <p className="text-sm font-bold text-slate-300">Return / RTO Cost</p>
           <div>
             <div className="flex items-baseline gap-3 mb-1">
-              <span className="text-3xl font-semibold text-white tracking-tight">₹4,110</span>
-              <span className="text-sm font-medium text-rose-400">-1.5%↓</span>
+              <span className="text-3xl font-semibold text-white tracking-tight">₹0</span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Compared to (₹4,165 last month)</p>
+            <p className="text-xs text-slate-500 font-medium">No returns yet</p>
           </div>
         </div>
 
@@ -109,9 +115,9 @@ export default function DashboardOverviewPage() {
           <p className="text-sm font-bold text-slate-300 relative z-10">Wallet Balance</p>
           <div className="relative z-10">
             <div className="flex items-baseline gap-3 mb-1">
-              <span className="text-3xl font-semibold text-white tracking-tight">₹1,422</span>
+              <span className="text-3xl font-semibold text-white tracking-tight">₹0</span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Available for prepaid shipping</p>
+            <p className="text-xs text-slate-500 font-medium">Add funds in Shiprocket</p>
           </div>
         </div>
 
