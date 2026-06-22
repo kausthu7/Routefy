@@ -5,11 +5,42 @@ import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
 export default function DashboardOverviewPage() {
   const [profile, setProfile] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  // Calculate chart data from orders
+  const getChartData = () => {
+    // Group last 7 days
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      return {
+        date: d.toISOString().split('T')[0],
+        displayDate: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        Prepaid: 0,
+        COD: 0
+      };
+    });
+
+    orders.forEach(order => {
+      if (!order.created_at) return;
+      const d = new Date(order.created_at).toISOString().split('T')[0];
+      const dayData = last7Days.find(x => x.date === d);
+      if (dayData) {
+        if (order.is_cod) {
+          dayData.COD += parseFloat(order.price) || 0;
+        } else {
+          dayData.Prepaid += parseFloat(order.price) || 0;
+        }
+      }
+    });
+    return last7Days;
+  };
 
   useEffect(() => {
     const init = async () => {
@@ -140,37 +171,30 @@ export default function DashboardOverviewPage() {
             </div>
           </div>
           
-          <div className="flex-1 border-b border-l border-slate-800/50 relative">
-            {/* Y-axis labels */}
-            <div className="absolute -left-8 top-0 bottom-0 flex flex-col justify-between text-[10px] text-slate-600 font-mono py-2">
-              <span>1k</span>
-              <span>800</span>
-              <span>600</span>
-              <span>400</span>
-              <span>200</span>
-              <span>0</span>
-            </div>
-            
-            {/* Grid lines */}
-            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-              {[1,2,3,4,5].map(i => <div key={i} className="w-full border-t border-slate-800/30" />)}
-            </div>
-
-            {/* Mock CSS SVG Chart lines */}
-            <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
-               <path d="M0,80 Q10,70 20,90 T40,60 T60,80 T80,30 T100,50" fill="none" stroke="#3b82f6" strokeWidth="1.5" />
-               <path d="M0,95 Q15,85 25,95 T45,75 T65,90 T85,50 T100,80" fill="none" stroke="#22c55e" strokeWidth="1.5" />
-            </svg>
-
-            {/* Mock Tooltip overlay exactly as in Vexel image */}
-            <div className="absolute top-[20%] left-[75%] -translate-x-1/2 -translate-y-1/2">
-              <div className="bg-[#1A2235] border border-slate-700/50 rounded-lg p-2.5 shadow-xl flex flex-col items-center">
-                <span className="text-white font-bold text-sm">₹27,632</span>
-                <span className="text-slate-400 text-[10px] font-medium">August</span>
-              </div>
-              <div className="w-px h-full bg-slate-700/50 absolute left-1/2 top-full -translate-x-1/2 -z-10 h-64" />
-              <div className="w-3 h-3 bg-[#1A2235] border-2 border-blue-500 rounded-full absolute left-1/2 -bottom-2 -translate-x-1/2 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
-            </div>
+          <div className="flex-1 mt-4 h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={getChartData()} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorPrepaid" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorCod" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="displayDate" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
+                <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val}`} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#1A2235', borderColor: '#334155', borderRadius: '8px' }}
+                  itemStyle={{ color: '#fff', fontSize: '12px' }}
+                />
+                <Area type="monotone" dataKey="Prepaid" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorPrepaid)" />
+                <Area type="monotone" dataKey="COD" stroke="#22c55e" strokeWidth={2} fillOpacity={1} fill="url(#colorCod)" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
