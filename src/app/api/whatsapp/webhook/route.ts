@@ -117,6 +117,15 @@ export async function POST(request: Request) {
 
               // 6. Process Extracted Data and Call Shiprocket
               if (parsedData) {
+                if (!parsedData.customer_name || !parsedData.customer_phone || !parsedData.delivery_address || !parsedData.pincode) {
+                  await sendWhatsAppMessage(
+                    phone_number_id, 
+                    from, 
+                    "It looks like you missed some details! ❌\n\nPlease provide all of the following in a single message so we can book your shipment:\n- Customer Name\n- Customer Phone\n- Delivery Address\n- Pincode\n\n(If it's COD, please include the amount too!)"
+                  );
+                  continue;
+                }
+
                 await sendWhatsAppMessage(phone_number_id, from, "Finding the best courier rates via Shiprocket... 🚚");
                 
                 // Fetch live couriers from Shiprocket API
@@ -239,12 +248,21 @@ async function sendWhatsAppInteractive(phone_number_id: string, to: string, orde
   
   const buttons = top3.map((courier) => {
     // Button title must be <= 20 chars
-    const shortName = courier.courier_name.substring(0, 10).trim();
+    // e.g. "Delhivery ₹60 4d"
+    const shortName = courier.courier_name.substring(0, 8).trim();
+    const daysText = courier.estimated_delivery_days ? ` ${courier.estimated_delivery_days}d` : '';
+    
+    // Ensure the total title doesn't exceed 20 characters
+    let title = `${shortName} ₹${courier.price}${daysText}`;
+    if (title.length > 20) {
+        title = title.substring(0, 20);
+    }
+
     return {
       type: 'reply',
       reply: {
         id: `confirm_${orderId}_${courier.courier_id}`,
-        title: `${shortName} ₹${courier.price}`
+        title: title
       }
     };
   });
