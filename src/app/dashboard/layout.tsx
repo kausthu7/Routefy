@@ -27,6 +27,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   ];
 
   const [showNotifications, setShowNotifications] = useState(false);
+  const [shopName, setShopName] = useState("Routefy Merchant");
   const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,12 +37,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
+    
+    fetch('/api/merchant/profile')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.shop_name) {
+          setShopName(data.shop_name);
+        }
+      })
+      .catch(err => console.error("Failed to fetch merchant profile:", err));
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/login');
+    window.location.href = '/login';
   };
 
   return (
@@ -144,7 +155,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Settings className="w-5 h-5" />
               </div>
               <div className="flex flex-col pr-2">
-                <span className="text-sm font-semibold text-slate-800 leading-none mb-1">Routefy Merchant</span>
+                <span className="text-sm font-semibold text-slate-800 leading-none mb-1">{shopName}</span>
                 <span className="text-[10px] text-slate-500 leading-none uppercase tracking-wider">Pro Plan</span>
               </div>
             </div>
