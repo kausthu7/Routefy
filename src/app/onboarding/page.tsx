@@ -171,7 +171,7 @@ export default function OnboardingPage() {
             <div className="pt-8 border-t border-slate-800/50">
               <div className="mb-6">
                 <Label className="text-lg font-semibold text-white">Default Product Catalog</Label>
-                <p className="text-sm text-slate-400 mt-1">If the WhatsApp bot cannot determine what the customer ordered, it will default to these weights for shipping calculation.</p>
+                <p className="text-sm text-slate-400 mt-1">If the Telegram bot cannot determine what the customer ordered, it will default to these weights for shipping calculation.</p>
               </div>
               
               <div className="space-y-4">

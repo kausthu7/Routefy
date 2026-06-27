@@ -3,6 +3,7 @@ export interface CourierOption {
   courier_name: string;
   price: number;
   estimated_delivery_days: number;
+  aggregator: 'shiprocket' | 'nimbuspost';
 }
 
 const SHIPROCKET_BASE_URL = 'https://apiv2.shiprocket.in/v1/external';
@@ -65,32 +66,67 @@ export async function getTopCouriers(
     // Sort by cheapest rate
     const sortedCouriers = couriers.sort((a: any, b: any) => a.rate - b.rate);
 
-    // Return the top 3
-    return sortedCouriers.slice(0, 3).map((c: any) => ({
+    // Return all available couriers
+    return sortedCouriers.map((c: any) => ({
       courier_id: c.courier_company_id.toString(),
       courier_name: c.courier_name,
       price: c.rate,
-      estimated_delivery_days: parseInt(c.estimated_delivery_days || '0', 10)
+      estimated_delivery_days: parseInt(c.estimated_delivery_days || '0', 10),
+      aggregator: 'shiprocket' as const
     }));
 
   } catch (error) {
     console.error('[Shiprocket API]', error);
-    // Fallback to mock for local testing if API fails or creds are missing
-    console.log('[Shiprocket] Falling back to mock couriers due to missing/invalid API credentials.');
-    const basePrice = weight_kg > 1 ? 80 : 60;
-    const codFee = is_cod ? 40 : 0;
-    return [
-      { courier_id: "10", courier_name: "Delhivery", price: basePrice + codFee, estimated_delivery_days: 4 },
-      { courier_id: "11", courier_name: "XpressBees", price: basePrice + codFee + 5, estimated_delivery_days: 3 },
-      { courier_id: "12", courier_name: "Ecom Express", price: basePrice + codFee + 12, estimated_delivery_days: 2 }
-    ];
+    throw new Error('Failed to fetch couriers from Shiprocket API. Check credentials.');
+  }
+}
+
+export async function addPickupLocation(pickupNickname: string, merchantName: string, phone: string, address: string, pincode: string, city: string, state: string) {
+  try {
+    const token = await getShiprocketToken();
+    const email = process.env.SHIPROCKET_EMAIL;
+
+    const payload = {
+      pickup_location: pickupNickname, // Dynamic name instead of hardcoded
+      name: merchantName || "Routefy Merchant",
+      email: email, // Must match the Shiprocket account email
+      phone: phone || "9876543210",
+      address: address || "Default Address",
+      address_2: "",
+      city: city || "City",
+      state: state || "State",
+      country: "India",
+      pin_code: pincode || "110001"
+    };
+
+    console.log(`[Shiprocket] Adding Pickup Location '${pickupNickname}' for ${merchantName}`);
+
+    const res = await fetch(`${SHIPROCKET_BASE_URL}/settings/company/addpickup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    console.log(`[Shiprocket] Add Pickup Response:`, data);
+    
+    // Sometimes it might return a success or an error if the location already exists
+    // We won't throw an error if it fails because it might just mean the location already exists.
+    return data;
+  } catch (error) {
+    console.error('[Shiprocket API Error] Failed to add pickup location', error);
+    // Silent fail so we don't crash the profile save
   }
 }
 
 export async function createOrderAndGenerateAWB(
   orderId: string,
   courierId: string,
-  order: any
+  order: any,
+  pickupNickname: string
 ): Promise<{ tracking_url: string; awb_code: string }> {
   try {
     const token = await getShiprocketToken();
@@ -98,7 +134,7 @@ export async function createOrderAndGenerateAWB(
     const orderPayload = {
       order_id: `RTFY_${orderId}_${Date.now()}`,
       order_date: new Date().toISOString().split('T')[0],
-      pickup_location: "Primary", // Configure in Shiprocket Dashboard
+      pickup_location: pickupNickname || "Primary", // Use the dynamic nickname
       billing_customer_name: order.customer_name || "Customer",
       billing_last_name: "",
       billing_address: order.delivery_address || "Delivery Address",
@@ -111,7 +147,7 @@ export async function createOrderAndGenerateAWB(
       shipping_is_billing: true,
       order_items: [
         {
-          name: "Item",
+          name: order.product_name || "Item",
           sku: "ITEM-1",
           units: 1,
           selling_price: order.is_cod ? order.cod_amount : 100,
@@ -122,16 +158,16 @@ export async function createOrderAndGenerateAWB(
       ],
       payment_method: order.is_cod ? "COD" : "Prepaid",
       sub_total: order.is_cod ? order.cod_amount : 100,
-      length: 10,
-      breadth: 10,
-      height: 10,
+      length: parseFloat(order.length_cm) || 10,
+      breadth: parseFloat(order.breadth_cm) || 10,
+      height: parseFloat(order.height_cm) || 10,
       weight: parseFloat(order.weight_kg) || 1
     };
 
     console.log(`[Shiprocket] Creating Order ID: ${orderPayload.order_id}`);
     
     // 1. Create Order
-    const createRes = await fetch(`${SHIPROCKET_BASE_URL}/orders/create/ad`, {
+    const createRes = await fetch(`${SHIPROCKET_BASE_URL}/orders/create/adhoc`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -184,13 +220,8 @@ export async function createOrderAndGenerateAWB(
       awb_code: awbData.response.data.awb_code
     };
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('[Shiprocket API Error]', error);
-    // Fallback to mock behavior for local testing
-    const mockAWB = `AWB${Math.floor(100000000 + Math.random() * 900000000)}`;
-    return {
-      tracking_url: `https://shiprocket.co/tracking/${mockAWB}`,
-      awb_code: mockAWB
-    };
+    throw new Error(error.message || 'Failed to create order and assign AWB via Shiprocket API.');
   }
 }

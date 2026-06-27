@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { waitUntil } from '@vercel/functions';
 import { parseDeliveryDetails, parseImageDetails, parseAudioDetails } from '@/lib/gemini';
 import { getTopCouriers, createOrderAndGenerateAWB, CourierOption } from '@/lib/shiprocket';
 import { sql } from '@/lib/db';
@@ -6,8 +7,8 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || 'mock-verify-token';
-const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN || 'mock-whatsapp-token';
+const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
+const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 
 export const maxDuration = 60; // Allow Vercel to run for up to 60 seconds instead of the default 10s timeout
 
@@ -27,13 +28,27 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log("================ INCOMING WEBHOOK ================");
+    console.log(JSON.stringify(body, null, 2));
+    console.log("==================================================");
 
+    waitUntil(processWebhook(body));
+
+    return NextResponse.json({ status: 'ok' });
+  } catch (error) {
+    console.error(error);
+    return new NextResponse('Internal Server Error', { status: 500 });
+  }
+}
+
+async function processWebhook(body: any) {
+  try {
     if (body.object === 'whatsapp_business_account') {
       for (const entry of body.entry) {
         for (const change of entry.changes) {
           if (change.value && change.value.messages) {
             for (const message of change.value.messages) {
-              const phone_number_id = change.value.metadata.phone_number_id;
+              const phone_number_id = change.value.metadata?.phone_number_id || process.env.WHATSAPP_PHONE_NUMBER_ID;
               const from = message.from; 
               
               // 1. Authenticate Merchant by Caller ID
@@ -55,19 +70,14 @@ export async function POST(request: Request) {
 
               // 2. Handle Interactive Confirmations (Shiprocket Checkout)
               if (message.type === 'interactive' && message.interactive.button_reply) {
-                const buttonId = message.interactive.button_reply.id; // e.g. confirm_uuid_courier123
+                const buttonId = message.interactive.button_reply.id; 
                 if (buttonId.startsWith('confirm_')) {
-                  // Parse button ID
                   const parts = buttonId.split('_');
-                  // parts: ['confirm', 'uuid1', 'uuid2', ... , 'courierid']
-                  // Wait, UUID has hyphens but no underscores.
-                  // Format: confirm_ORDERID_COURIERID
                   const orderId = parts[1];
-                  const courierId = parts.slice(2).join('_'); // Rejoin in case courierId has underscores
+                  const courierId = parts.slice(2).join('_');
 
                   await sendWhatsAppMessage(phone_number_id, from, "Processing your booking with Shiprocket... ⏳");
                   
-                  // Fetch the real order data from the database
                   const { rows: orderRows } = await sql`SELECT * FROM orders WHERE id = ${orderId} LIMIT 1`;
                   const order = orderRows[0];
                   
@@ -76,14 +86,13 @@ export async function POST(request: Request) {
                     continue;
                   }
 
-                  // Generate AWB via Shiprocket using real data
-                  const shipmentDetails = await createOrderAndGenerateAWB(orderId, courierId, order);
-
-                  // Update DB
-                  await sql`UPDATE orders SET status = 'dispatched' WHERE id = ${orderId}`;
-                  
-                  // Reply with Tracking Link
-                  await sendWhatsAppMessage(phone_number_id, from, `✅ Shipment officially booked! The agent will arrive tomorrow.\n\nTrack here: ${shipmentDetails.tracking_url}`);
+                  try {
+                    const shipmentDetails = await createOrderAndGenerateAWB(orderId, courierId, order, 'Primary');
+                    await sql`UPDATE orders SET status = 'dispatched' WHERE id = ${orderId}`;
+                    await sendWhatsAppMessage(phone_number_id, from, `✅ Shipment officially booked! The agent will arrive tomorrow.\n\nTrack here: ${shipmentDetails.tracking_url}`);
+                  } catch (err: any) {
+                    await sendWhatsAppMessage(phone_number_id, from, `❌ Failed to book shipment: ${err.message}`);
+                  }
                 }
                 continue;
               }
@@ -117,7 +126,9 @@ export async function POST(request: Request) {
 
               // 6. Process Extracted Data and Call Shiprocket
               if (parsedData) {
-                if (!parsedData.customer_name || !parsedData.customer_phone || !parsedData.delivery_address || !parsedData.pincode) {
+                const isMissing = (val: any) => !val || val === 'null' || val === 'N/A' || val === 'Unknown' || String(val).trim() === '';
+
+                if (isMissing(parsedData.customer_name) || isMissing(parsedData.customer_phone) || isMissing(parsedData.delivery_address) || isMissing(parsedData.pincode)) {
                   await sendWhatsAppMessage(
                     phone_number_id, 
                     from, 
@@ -128,7 +139,6 @@ export async function POST(request: Request) {
 
                 await sendWhatsAppMessage(phone_number_id, from, "Finding the best courier rates via Shiprocket... 🚚");
                 
-                // Fetch live couriers from Shiprocket API
                 const couriers = await getTopCouriers(
                   merchantData.pickup_pincode || '110001',
                   parsedData.pincode,
@@ -137,7 +147,6 @@ export async function POST(request: Request) {
                 );
 
                 let orderData = null;
-                let error = null;
                 try {
                   const { rows } = await sql`
                     INSERT INTO orders (
@@ -148,14 +157,12 @@ export async function POST(request: Request) {
                   `;
                   orderData = rows[0];
                 } catch (e) {
-                  error = e;
+                  console.error("Error saving order:", e);
                 }
 
                 if (orderData) {
-                  // Send the 3 interactive buttons
                   await sendWhatsAppInteractive(phone_number_id, from, orderData.id, couriers);
                 } else {
-                  console.error("Error saving order:", error);
                   await sendWhatsAppMessage(phone_number_id, from, "❌ Sorry, there was an error saving your order.");
                 }
               }
@@ -164,51 +171,46 @@ export async function POST(request: Request) {
         }
       }
     }
-
-    return NextResponse.json({ status: 'ok' });
   } catch (error) {
-    console.error(error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    console.error("Webhook processing error:", error);
   }
 }
 
 // Media Downloader Helpers
 async function downloadWhatsAppMediaAsBase64(mediaId: string): Promise<string> {
-  if (process.env.WHATSAPP_TOKEN) {
-    const urlRes = await fetch(`https://graph.facebook.com/v17.0/${mediaId}`, {
-      headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
-    });
-    const urlData = await urlRes.json();
-    
-    if (urlData.url) {
-      const mediaRes = await fetch(urlData.url, {
-        headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
-      });
-      const buffer = await mediaRes.arrayBuffer();
-      return Buffer.from(buffer).toString('base64');
-    }
-  }
-  return "mock-base64-string";
+  if (!WHATSAPP_TOKEN) throw new Error("Missing WHATSAPP_TOKEN");
+
+  const urlRes = await fetch(`https://graph.facebook.com/v17.0/${mediaId}`, {
+    headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
+  });
+  const urlData = await urlRes.json();
+  
+  if (!urlData.url) throw new Error("Failed to get media URL");
+
+  const mediaRes = await fetch(urlData.url, {
+    headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
+  });
+  const buffer = await mediaRes.arrayBuffer();
+  return Buffer.from(buffer).toString('base64');
 }
 
 async function downloadWhatsAppMediaToFile(mediaId: string): Promise<string> {
-  if (process.env.WHATSAPP_TOKEN) {
-    const urlRes = await fetch(`https://graph.facebook.com/v17.0/${mediaId}`, {
-      headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
-    });
-    const urlData = await urlRes.json();
-    
-    if (urlData.url) {
-      const mediaRes = await fetch(urlData.url, {
-        headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
-      });
-      const buffer = await mediaRes.arrayBuffer();
-      const tempFilePath = path.join(os.tmpdir(), `${mediaId}.ogg`);
-      fs.writeFileSync(tempFilePath, Buffer.from(buffer));
-      return tempFilePath;
-    }
-  }
-  return "mock-audio-path";
+  if (!WHATSAPP_TOKEN) throw new Error("Missing WHATSAPP_TOKEN");
+
+  const urlRes = await fetch(`https://graph.facebook.com/v17.0/${mediaId}`, {
+    headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
+  });
+  const urlData = await urlRes.json();
+  
+  if (!urlData.url) throw new Error("Failed to get media URL");
+
+  const mediaRes = await fetch(urlData.url, {
+    headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
+  });
+  const buffer = await mediaRes.arrayBuffer();
+  const tempFilePath = path.join(os.tmpdir(), `${mediaId}.ogg`);
+  fs.writeFileSync(tempFilePath, Buffer.from(buffer));
+  return tempFilePath;
 }
 
 // Send WhatsApp Message Helper
@@ -221,24 +223,25 @@ async function sendWhatsAppMessage(phone_number_id: string, to: string, text: st
     await sql`INSERT INTO ai_messages (merchant_id, sender, text_content) VALUES (${m.id}, 'ai', ${text})`;
   }
 
-  if (process.env.WHATSAPP_TOKEN) {
-    const res = await fetch(`https://graph.facebook.com/v17.0/${phone_number_id}/messages`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        messaging_product: 'whatsapp',
-        to: to,
-        text: { body: text }
-      })
-    });
-    const resData = await res.json();
-    console.log(`[Meta API] Sent message to ${to}. Response:`, resData);
-  } else {
-    console.log(`[Mock WhatsApp] To: ${to} | Message: ${text}`);
+  if (!WHATSAPP_TOKEN) {
+    console.warn("Cannot send message: WHATSAPP_TOKEN missing.");
+    return;
   }
+
+  const res = await fetch(`https://graph.facebook.com/v17.0/${phone_number_id}/messages`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to: to,
+      text: { body: text }
+    })
+  });
+  const resData = await res.json();
+  console.log(`[Meta API] Sent message to ${to}. Response:`, resData);
 }
 
 // Send Interactive Message Helper (Shiprocket 3-Button Flow)
@@ -278,30 +281,30 @@ async function sendWhatsAppInteractive(phone_number_id: string, to: string, orde
     await sql`INSERT INTO ai_messages (merchant_id, sender, text_content) VALUES (${m.id}, 'ai', ${`${messageText}\n\n${optionsText}`})`;
   }
 
-  if (process.env.WHATSAPP_TOKEN) {
-    await fetch(`https://graph.facebook.com/v17.0/${phone_number_id}/messages`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        messaging_product: 'whatsapp',
-        to: to,
-        type: 'interactive',
-        interactive: {
-          type: 'button',
-          body: {
-            text: messageText
-          },
-          action: {
-            buttons: buttons
-          }
-        }
-      })
-    });
-  } else {
-    console.log(`[Mock WhatsApp Interactive] To: ${to} | ${messageText}`);
-    buttons.forEach(b => console.log(`  Button: [${b.reply.title}] -> Payload: ${b.reply.id}`));
+  if (!WHATSAPP_TOKEN) {
+    console.warn("Cannot send interactive message: WHATSAPP_TOKEN missing.");
+    return;
   }
+
+  await fetch(`https://graph.facebook.com/v17.0/${phone_number_id}/messages`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to: to,
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: {
+          text: messageText
+        },
+        action: {
+          buttons: buttons
+        }
+      }
+    })
+  });
 }
