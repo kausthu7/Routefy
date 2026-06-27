@@ -67,6 +67,12 @@ export async function POST(request: Request) {
       }
     }
 
+    // Check if email already belongs to another user
+    const { rows: emailCheckRows } = await sql`SELECT id FROM merchants WHERE email = ${email} AND id != ${id}`;
+    if (emailCheckRows.length > 0) {
+      return NextResponse.json({ error: 'This email is already in use by another account.' }, { status: 409 });
+    }
+
     try {
       await sql`
         UPDATE merchants SET 
