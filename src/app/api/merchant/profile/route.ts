@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { sql } from '@/lib/db';
 import { addPickupLocation } from '@/lib/shiprocket';
-import bcrypt from 'bcryptjs';
 
 export async function GET() {
   const merchantId = await getSessionMerchantId();
@@ -48,7 +47,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { shop_name, pickup_address, pickup_pincode, default_product, phone_number: newPhone, new_password } = await request.json();
+    const { shop_name, pickup_address, pickup_pincode, default_product, phone_number: newPhone } = await request.json();
 
     if (!shop_name || !pickup_address || !pickup_pincode) {
       return NextResponse.json({ error: 'Shop Name, Pickup Address, and Pincode are mandatory fields.' }, { status: 400 });
@@ -69,32 +68,17 @@ export async function POST(request: Request) {
     }
 
     try {
-      if (new_password) {
-        const salt = await bcrypt.genSalt(10);
-        const password_hash = await bcrypt.hash(new_password, salt);
-        
-        await sql`
-          UPDATE merchants SET 
-            shop_name = ${shop_name},
-            pickup_address = ${pickup_address},
-            pickup_pincode = ${pickup_pincode},
-            password_hash = ${password_hash},
-            default_product = COALESCE(${default_product || null}, default_product)
-          WHERE id = ${id}
-        `;
-      } else {
-        await sql`
-          UPDATE merchants SET 
-            shop_name = ${shop_name},
-            pickup_address = ${pickup_address},
-            pickup_pincode = ${pickup_pincode},
-            default_product = COALESCE(${default_product || null}, default_product)
-          WHERE id = ${id}
-        `;
-      }
-    } catch (error) {
+      await sql`
+        UPDATE merchants SET 
+          shop_name = ${shop_name},
+          pickup_address = ${pickup_address},
+          pickup_pincode = ${pickup_pincode},
+          default_product = COALESCE(${default_product || null}, default_product)
+        WHERE id = ${id}
+      `;
+    } catch (error: any) {
       console.error("CRITICAL POSTGRES ERROR:", error);
-      return NextResponse.json({ error: 'Database update failed' }, { status: 500 });
+      return NextResponse.json({ error: 'Database update failed: ' + (error.message || error.toString()) }, { status: 500 });
     }
 
     // Connect to Shiprocket API

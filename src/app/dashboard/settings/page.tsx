@@ -180,21 +180,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                 </div>
-
-                <div className="pt-6 border-t border-slate-100">
-                  <h3 className="font-semibold text-slate-900 mb-4">Security</h3>
-                  <div className="space-y-2 md:w-1/2">
-                    <Label className="text-slate-700">New Password (Leave blank to keep current)</Label>
-                    <Input 
-                      type="password"
-                      value={profile.new_password || ''} 
-                      onChange={e => setProfile({...profile, new_password: e.target.value})}
-                      className="bg-white border-slate-200 text-slate-900 focus-visible:ring-purple-500/50" 
-                      placeholder="••••••••"
-                    />
-                  </div>
-                </div>
-
+                
                 <div className="pt-6 border-t border-slate-100">
                   <h3 className="font-semibold text-slate-900 mb-4">Default Pickup Location</h3>
                   <div className="space-y-6">
