@@ -173,10 +173,17 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-slate-700">Email (Optional)</Label>
+                    <Label className="text-slate-700">Email *</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <Input placeholder="hello@trendythreads.com" className="pl-10 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus-visible:ring-purple-500/50" />
+                      <Input 
+                        required
+                        type="email"
+                        value={profile.email || ''} 
+                        onChange={e => setProfile({...profile, email: e.target.value})}
+                        placeholder="hello@trendythreads.com" 
+                        className="pl-10 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus-visible:ring-purple-500/50" 
+                      />
                     </div>
                   </div>
                 </div>

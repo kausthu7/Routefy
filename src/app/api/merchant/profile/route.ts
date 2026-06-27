@@ -47,10 +47,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { shop_name, pickup_address, pickup_pincode, default_product, phone_number: newPhone } = await request.json();
+    const { shop_name, pickup_address, pickup_pincode, default_product, phone_number: newPhone, email } = await request.json();
 
-    if (!shop_name || !pickup_address || !pickup_pincode) {
-      return NextResponse.json({ error: 'Shop Name, Pickup Address, and Pincode are mandatory fields.' }, { status: 400 });
+    if (!shop_name || !pickup_address || !pickup_pincode || !email) {
+      return NextResponse.json({ error: 'Shop Name, Email, Pickup Address, and Pincode are mandatory fields.' }, { status: 400 });
     }
 
     const { rows: merchantRows } = await sql`SELECT phone_number FROM merchants WHERE id = ${id}`;
@@ -73,6 +73,7 @@ export async function POST(request: Request) {
           shop_name = ${shop_name},
           pickup_address = ${pickup_address},
           pickup_pincode = ${pickup_pincode},
+          email = ${email},
           default_product = COALESCE(${default_product || null}, default_product)
         WHERE id = ${id}
       `;
