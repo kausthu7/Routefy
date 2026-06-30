@@ -116,14 +116,14 @@ export default function SettingsPage() {
       
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-white md:text-slate-900 drop-shadow-sm">Settings</h1>
-        <p className="text-purple-100 md:text-slate-500 mt-1 text-sm font-medium">Manage your profile, locations, and integrations</p>
+        <p className="text-[#F9DF77] md:text-slate-500 mt-1 text-sm font-medium">Manage your profile, locations, and integrations</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         
         {/* Navigation Sidebar for settings (desktop) */}
         <div className="hidden md:flex flex-col space-y-2">
-          <button className="flex items-center w-full px-4 py-3 rounded-xl bg-purple-50 text-purple-700 font-semibold shadow-[inset_2px_0_0_0_#9333ea] transition-all">
+          <button className="flex items-center w-full px-4 py-3 rounded-xl bg-brand-main/10 text-brand-dark font-semibold shadow-[inset_2px_0_0_0_#4D50A2] transition-all">
             <Store className="w-4 h-4 mr-3" /> Business Profile
           </button>
           <button className="flex items-center w-full px-4 py-3 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all">
@@ -153,21 +153,21 @@ export default function SettingsPage() {
                     required
                     value={profile.shop_name || ''} 
                     onChange={e => setProfile({...profile, shop_name: e.target.value})}
-                    className="bg-white border-slate-200 text-slate-900 focus-visible:ring-purple-500/50" 
+                    className="bg-white border-slate-200 text-slate-900 focus-visible:ring-brand-main/50" 
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label className="text-slate-700 flex items-center justify-between">
                       <span>Phone (Your Caller ID)</span>
-                      <span className="text-xs text-purple-700 font-medium bg-purple-50 px-2 py-0.5 rounded-full">Used for Bot Auth</span>
+                      <span className="text-xs text-brand-dark font-medium bg-brand-main/10 px-2 py-0.5 rounded-full">Used for Bot Auth</span>
                     </Label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <Input 
                         value={profile.phone_number || ''} 
                         onChange={e => setProfile({...profile, phone_number: e.target.value})}
-                        className="pl-10 bg-white border-slate-200 text-slate-900 focus-visible:ring-purple-500/50" 
+                        className="pl-10 bg-white border-slate-200 text-slate-900 focus-visible:ring-brand-main/50" 
                         placeholder="+91 9876543210"
                       />
                     </div>
@@ -182,7 +182,7 @@ export default function SettingsPage() {
                         value={profile.email || ''} 
                         onChange={e => setProfile({...profile, email: e.target.value})}
                         placeholder="hello@trendythreads.com" 
-                        className="pl-10 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus-visible:ring-purple-500/50" 
+                        className="pl-10 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus-visible:ring-brand-main/50" 
                       />
                     </div>
                   </div>
@@ -197,7 +197,7 @@ export default function SettingsPage() {
                         required
                         value={profile.pickup_address || ''} 
                         onChange={e => setProfile({...profile, pickup_address: e.target.value})}
-                        className="bg-white border-slate-200 text-slate-900 focus-visible:ring-purple-500/50" 
+                        className="bg-white border-slate-200 text-slate-900 focus-visible:ring-brand-main/50" 
                       />
                     </div>
                     <div className="space-y-2 md:w-1/2">
@@ -206,7 +206,7 @@ export default function SettingsPage() {
                         required
                         value={profile.pickup_pincode || ''} 
                         onChange={e => setProfile({...profile, pickup_pincode: e.target.value})}
-                        className="bg-white border-slate-200 text-slate-900 focus-visible:ring-purple-500/50" 
+                        className="bg-white border-slate-200 text-slate-900 focus-visible:ring-brand-main/50" 
                       />
                     </div>
                   </div>
@@ -221,7 +221,7 @@ export default function SettingsPage() {
                 <button 
                   type="submit" 
                   disabled={saving} 
-                  className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 px-6 rounded-xl shadow-sm transition-all flex items-center justify-center"
+                  className="w-full sm:w-auto bg-brand-main hover:bg-brand-dark text-white font-semibold py-2.5 px-6 rounded-xl shadow-sm transition-all flex items-center justify-center"
                 >
                   {saving ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : 'Save Changes'}
                 </button>

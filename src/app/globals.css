@@ -5,25 +5,26 @@
 
 @layer base {
   :root {
+    --stripe-color: #000;
     --background: 210 20% 98%; /* Light gray background #f8f9fa */
     --foreground: 222.2 84% 4.9%; /* Very dark blue/black text */
     --card: 0 0% 100%; /* White cards */
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 262.1 83.3% 57.8%; /* Purple-600 */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --primary: 238 35% 47%; /* #4D50A2 Medium Blue */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 48 92% 72%; /* #F9DF77 Yellow */
+    --secondary-foreground: 237 42% 32%; /* #2F3273 Dark Blue */
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 48 92% 72%; /* #F9DF77 Yellow */
+    --accent-foreground: 237 42% 32%; /* #2F3273 Dark Blue */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%; /* Light gray borders */
+    --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 262.1 83.3% 57.8%; /* Purple ring */
+    --ring: 238 35% 47%; /* #4D50A2 Medium Blue */
     --radius: 1rem;
   }
 }
@@ -35,11 +36,11 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-geist-mono), monospace;
     -webkit-font-smoothing: antialiased;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-geist-mono), monospace;
   }
 }
 

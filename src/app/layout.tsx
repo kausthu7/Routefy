@@ -3,14 +3,15 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 
-const inter = Inter({ 
-  subsets: ["latin"], 
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-sans",
-  display: 'swap',
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
+  display: "swap",
 });
+
+import { AnimatedRays } from "@/components/ui/animated-rays";
 
 export const metadata: Metadata = {
   title: "Routefy",
@@ -23,9 +24,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="font-sans antialiased">
-        {children}
+    <html lang="en" className={jakarta.variable}>
+      <body className="font-sans antialiased bg-[#14152e] text-slate-100">
+        <AnimatedRays>
+          {children}
+        </AnimatedRays>
       </body>
     </html>
   );

@@ -11,13 +11,13 @@ export default function LandingPage() {
         
         {/* Left Content */}
         <div className="flex-1 flex flex-col items-start text-left z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#6D4AFF]/30 text-[#6D4AFF] text-[10px] font-bold mb-6 tracking-widest uppercase">
-            <span className="w-2 h-2 rounded-full border border-[#6D4AFF] animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#4D50A2]/30 text-[#4D50A2] text-[10px] font-bold mb-6 tracking-widest uppercase">
+            <span className="w-2 h-2 rounded-full border border-[#4D50A2] animate-pulse" />
             AI-POWERED LOGISTICS AUTOMATION
           </div>
           
           <h1 className="text-[36px] md:text-[52px] font-[700] text-white tracking-tight leading-[1.1] mb-6">
-            Automate your deliveries directly through <span className="text-[#6D4AFF]">Telegram.</span>
+            Automate your deliveries directly through <span className="text-[#4D50A2]">Telegram.</span>
           </h1>
           
           <p className="text-[14px] md:text-[16px] font-[400] text-slate-400 mb-8 max-w-xl leading-relaxed">
@@ -25,7 +25,7 @@ export default function LandingPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-10 w-full sm:w-auto">
-            <Link href="/login" className="w-full sm:w-auto px-8 py-3.5 bg-[#6D4AFF] hover:bg-[#5B3DF5] text-white text-[16px] font-[600] rounded-lg transition-all flex items-center justify-center group shadow-[0_0_20px_rgba(109,74,255,0.4)]">
+            <Link href="/login" className="w-full sm:w-auto px-8 py-3.5 bg-[#4D50A2] hover:bg-[#2F3273] text-white text-[16px] font-[600] rounded-lg transition-all flex items-center justify-center group shadow-[0_0_20px_rgba(109,74,255,0.4)]">
               Get Started for Free
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -37,13 +37,13 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row gap-6 text-slate-300 text-[14px] font-[400]">
             <div className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-[#6D4AFF]" /> No credit card required
+              <Check className="w-4 h-4 text-[#4D50A2]" /> No credit card required
             </div>
             <div className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-[#6D4AFF]" /> Setup in 2 minutes
+              <Check className="w-4 h-4 text-[#4D50A2]" /> Setup in 2 minutes
             </div>
             <div className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-[#6D4AFF]" /> Cancel anytime
+              <Check className="w-4 h-4 text-[#4D50A2]" /> Cancel anytime
             </div>
           </div>
         </div>
@@ -70,7 +70,7 @@ export default function LandingPage() {
                   {/* Chat Header */}
                   <div className="h-16 border-b border-white/5 flex items-center px-4 gap-3 bg-[#131722]">
                     <div className="text-slate-400 font-bold">{'<'}</div>
-                    <div className="w-10 h-10 bg-[#6D4AFF] rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-[#4D50A2] rounded-full flex items-center justify-center">
                       <Package className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -124,8 +124,8 @@ export default function LandingPage() {
                   {/* Extracted Details */}
                   <div className="space-y-5 mb-6">
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#6D4AFF]/20 flex items-center justify-center shrink-0 mt-0.5">
-                        <User className="w-3 h-3 text-[#6D4AFF]" />
+                      <div className="w-6 h-6 rounded-full bg-[#4D50A2]/20 flex items-center justify-center shrink-0 mt-0.5">
+                        <User className="w-3 h-3 text-[#4D50A2]" />
                       </div>
                       <div className="text-[12px] leading-tight">
                         <p className="text-white font-[600]">Rahul Sharma</p>
@@ -133,8 +133,8 @@ export default function LandingPage() {
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#6D4AFF]/20 flex items-center justify-center shrink-0 mt-0.5">
-                        <MapPin className="w-3 h-3 text-[#6D4AFF]" />
+                      <div className="w-6 h-6 rounded-full bg-[#4D50A2]/20 flex items-center justify-center shrink-0 mt-0.5">
+                        <MapPin className="w-3 h-3 text-[#4D50A2]" />
                       </div>
                       <div className="text-[12px] leading-tight">
                         <p className="text-white font-[600]">Flat 4B, MG Road</p>
@@ -142,8 +142,8 @@ export default function LandingPage() {
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#6D4AFF]/20 flex items-center justify-center shrink-0 mt-0.5">
-                        <Package className="w-3 h-3 text-[#6D4AFF]" />
+                      <div className="w-6 h-6 rounded-full bg-[#4D50A2]/20 flex items-center justify-center shrink-0 mt-0.5">
+                        <Package className="w-3 h-3 text-[#4D50A2]" />
                       </div>
                       <div className="text-[12px] leading-tight">
                         <p className="text-white font-[600]">2 x Protein Powder</p>
@@ -158,9 +158,9 @@ export default function LandingPage() {
                   
                   {/* Couriers */}
                   <div className="space-y-2 mb-6">
-                    <div className="flex items-center justify-between p-2 rounded-lg bg-[#6D4AFF]/10 border border-[#6D4AFF]/30 cursor-pointer">
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-[#4D50A2]/10 border border-[#4D50A2]/30 cursor-pointer">
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-[#6D4AFF] flex items-center justify-center">
+                        <div className="w-4 h-4 rounded-full bg-[#4D50A2] flex items-center justify-center">
                            <Check className="w-2.5 h-2.5 text-white" />
                         </div>
                         <span className="text-[12px] text-white font-[500]">Xpressbees</span>
@@ -194,7 +194,7 @@ export default function LandingPage() {
                     </div>
                   </div>
 
-                  <button className="w-full mt-auto py-3 bg-[#6D4AFF] hover:bg-[#5B3DF5] text-white text-[12px] font-[600] rounded-lg transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(109,74,255,0.4)]">
+                  <button className="w-full mt-auto py-3 bg-[#4D50A2] hover:bg-[#2F3273] text-white text-[12px] font-[600] rounded-lg transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(109,74,255,0.4)]">
                     <Zap className="w-3.5 h-3.5" fill="currentColor" /> Book Shipment
                   </button>
                 </div>
@@ -224,8 +224,8 @@ export default function LandingPage() {
       <section id="features" className="w-full max-w-[1400px] mx-auto px-6 py-24 mt-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="p-[24px] rounded-[24px] bg-gradient-to-b from-white/[0.03] to-transparent border-t border-l border-white/5 hover:bg-white/[0.05] transition-colors shadow-2xl relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#6D4AFF]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="w-12 h-12 bg-[#6D4AFF]/10 text-[#6D4AFF] rounded-xl flex items-center justify-center mb-6 relative z-10 border border-[#6D4AFF]/20">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#4D50A2]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="w-12 h-12 bg-[#4D50A2]/10 text-[#4D50A2] rounded-xl flex items-center justify-center mb-6 relative z-10 border border-[#4D50A2]/20">
               <Zap className="w-5 h-5" fill="currentColor" />
             </div>
             <h3 className="text-[20px] font-[600] text-white mb-3 relative z-10">Lightning Fast</h3>
@@ -234,7 +234,7 @@ export default function LandingPage() {
 
           <div className="p-[24px] rounded-[24px] bg-gradient-to-b from-white/[0.03] to-transparent border-t border-l border-white/5 hover:bg-white/[0.05] transition-colors shadow-2xl relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="w-12 h-12 bg-[#6D4AFF]/10 text-[#6D4AFF] rounded-xl flex items-center justify-center mb-6 relative z-10 border border-[#6D4AFF]/20">
+            <div className="w-12 h-12 bg-[#4D50A2]/10 text-[#4D50A2] rounded-xl flex items-center justify-center mb-6 relative z-10 border border-[#4D50A2]/20">
               <Bot className="w-5 h-5" />
             </div>
             <h3 className="text-[20px] font-[600] text-white mb-3 relative z-10">AI-Powered Accuracy</h3>
@@ -243,7 +243,7 @@ export default function LandingPage() {
 
           <div className="p-[24px] rounded-[24px] bg-gradient-to-b from-white/[0.03] to-transparent border-t border-l border-white/5 hover:bg-white/[0.05] transition-colors shadow-2xl relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="w-12 h-12 bg-[#6D4AFF]/10 text-[#6D4AFF] rounded-xl flex items-center justify-center mb-6 relative z-10 border border-[#6D4AFF]/20">
+            <div className="w-12 h-12 bg-[#4D50A2]/10 text-[#4D50A2] rounded-xl flex items-center justify-center mb-6 relative z-10 border border-[#4D50A2]/20">
               <Package className="w-5 h-5" />
             </div>
             <h3 className="text-[20px] font-[600] text-white mb-3 relative z-10">Cheapest Rates</h3>
@@ -252,7 +252,7 @@ export default function LandingPage() {
 
           <div className="p-[24px] rounded-[24px] bg-gradient-to-b from-white/[0.03] to-transparent border-t border-l border-white/5 hover:bg-white/[0.05] transition-colors shadow-2xl relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="w-12 h-12 bg-[#6D4AFF]/10 text-[#6D4AFF] rounded-xl flex items-center justify-center mb-6 relative z-10 border border-[#6D4AFF]/20">
+            <div className="w-12 h-12 bg-[#4D50A2]/10 text-[#4D50A2] rounded-xl flex items-center justify-center mb-6 relative z-10 border border-[#4D50A2]/20">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <h3 className="text-[20px] font-[600] text-white mb-3 relative z-10">Secure & Reliable</h3>

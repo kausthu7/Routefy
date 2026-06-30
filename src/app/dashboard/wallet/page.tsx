@@ -142,10 +142,10 @@ export default function WalletPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         
         {/* Main Balance Card (Credit Card Style) */}
-        <div className="md:col-span-2 bg-purple-600 rounded-[24px] overflow-hidden relative border border-purple-500 group shadow-lg">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-transparent to-indigo-600 pointer-events-none" />
+        <div className="md:col-span-2 bg-[#2F3273] rounded-[24px] overflow-hidden relative border border-[#4D50A2] group shadow-lg">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#4D50A2] via-transparent to-[#2F3273] pointer-events-none" />
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[80px] -mr-10 -mt-10 transition-transform duration-700 group-hover:scale-110 z-0" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-[80px] -ml-20 -mb-20 transition-transform duration-700 group-hover:scale-110 z-0" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-main/40 rounded-full blur-[80px] -ml-20 -mb-20 transition-transform duration-700 group-hover:scale-110 z-0" />
           
           <div className="p-8 relative z-10 h-full flex flex-col justify-between">
             <div className="flex items-center justify-between mb-10">
@@ -155,11 +155,11 @@ export default function WalletPage() {
                 </div>
                 <span className="font-bold text-white tracking-widest uppercase text-sm opacity-90">Routefy Prepaid</span>
               </div>
-              <Badge className="bg-white/20 text-white border border-white/30 shadow-sm font-bold uppercase tracking-wider text-[10px] px-3 py-1 rounded-full backdrop-blur-sm">Active</Badge>
+              <Badge className="bg-[#4D50A2]/50 text-white border border-[#4D50A2] shadow-sm font-bold uppercase tracking-wider text-[10px] px-3 py-1 rounded-full backdrop-blur-sm">Active</Badge>
             </div>
             
             <div>
-              <p className="text-purple-100 text-xs font-bold tracking-[0.2em] uppercase mb-3">Available Balance</p>
+              <p className="text-[#F9DF77] text-xs font-bold tracking-[0.2em] uppercase mb-3">Available Balance</p>
               <div className="text-5xl md:text-6xl font-extrabold tracking-tight text-white flex items-center drop-shadow-xl">
                 <IndianRupee className="w-10 h-10 md:w-12 md:h-12 mr-2 text-white/80" />
                 {loading ? '...' : new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(balance)}
@@ -177,7 +177,7 @@ export default function WalletPage() {
                 key={amt} 
                 onClick={() => handleTopup(amt)}
                 disabled={isToppingUp}
-                className="bg-slate-50 border border-slate-200 h-14 rounded-[16px] font-bold text-slate-700 hover:text-purple-700 hover:bg-purple-50 transition-all disabled:opacity-50 hover:border-purple-200 flex items-center justify-center text-lg"
+                className="bg-slate-50 border border-slate-200 h-14 rounded-[16px] font-bold text-slate-700 hover:text-brand-main hover:bg-brand-main/5 transition-all disabled:opacity-50 hover:border-brand-main/30 flex items-center justify-center text-lg"
               >
                 ₹{amt}
               </button>
@@ -186,9 +186,9 @@ export default function WalletPage() {
           <button 
              onClick={() => handleTopup(10000)}
              disabled={isToppingUp}
-             className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold h-14 rounded-[16px] shadow-sm transition-all flex items-center justify-center disabled:opacity-50 mt-auto"
+             className="w-full bg-[#4D50A2] hover:bg-[#2F3273] text-white font-bold h-14 rounded-[16px] shadow-sm transition-all flex items-center justify-center disabled:opacity-50 mt-auto"
           >
-            <Plus className="w-5 h-5 mr-2" /> Custom Amount
+            <Plus className="w-5 h-5 mr-2 text-[#F9DF77]" /> Custom Amount
           </button>
         </div>
       </div>
@@ -199,7 +199,7 @@ export default function WalletPage() {
         <div className="bg-white rounded-[24px] overflow-hidden h-[400px] flex flex-col border border-slate-100 shadow-sm">
           {loading ? (
             <div className="py-24 flex flex-col items-center justify-center text-slate-500 font-medium">
-              <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mb-4" />
+              <div className="w-8 h-8 border-2 border-brand-main border-t-transparent rounded-full animate-spin mb-4" />
               Loading ledger...
             </div>
           ) : (

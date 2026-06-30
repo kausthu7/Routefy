@@ -9,10 +9,26 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      keyframes: {
+        "aurora-bg": {
+          from: { backgroundPosition: "50% 50%, 50% 50%" },
+          to: { backgroundPosition: "350% 50%, 350% 50%" },
+        },
+      },
+      animation: {
+        "aurora-bg": "aurora-bg 60s linear infinite",
+      },
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        sans: ["var(--font-jakarta)", "system-ui", "sans-serif"],
+        serif: ["var(--font-jakarta)", "serif"],
+        mono: ["var(--font-jakarta)", "monospace"],
       },
       colors: {
+        brand: {
+          dark: '#2F3273',
+          main: '#4D50A2',
+          accent: '#F9DF77',
+        },
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",

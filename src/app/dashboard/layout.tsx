@@ -37,7 +37,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    
+
     fetch('/api/merchant/profile')
       .then(res => res.json())
       .then(data => {
@@ -56,34 +56,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className="min-h-screen text-slate-900 flex flex-col md:flex-row font-sans bg-[#F4F6F9] relative md:p-6 gap-[16px] md:gap-6">
-
-      {/* Mobile Purple Header Background */}
-      <div className="md:hidden absolute top-0 left-0 right-0 h-[260px] bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] rounded-b-[40px] z-0 shadow-[0_10px_30px_rgba(124,58,237,0.3)]">
-        <div className="absolute inset-0 bg-white/5 blur-2xl rounded-b-[40px]" />
-      </div>
+    <div className="min-h-screen text-slate-900 flex flex-col md:flex-row font-sans bg-gradient-to-b from-[#5a5db8] to-[#2F3273] md:bg-none md:bg-[#F4F6F9] relative md:p-6 gap-[16px] md:gap-6">
 
       {/* Deep Midnight Background for Desktop (keep dark sidebar for contrast or change to light? Let's make it fully light) */}
       <div className="hidden md:block fixed inset-0 z-[-10] bg-[#F4F7FF] overflow-hidden"></div>
 
       {/* Mobile Top Header */}
       <header className="md:hidden flex items-center justify-between z-40 relative px-6 pt-[56px] pb-4">
-        <RoutefyLogo iconSize="h-14 w-auto" />
-        <div className="flex items-center gap-[12px]">
+        {/* Left: Settings */}
+        <div onClick={() => router.push('/dashboard/settings')} className="w-[40px] h-[40px] rounded-[12px] bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 cursor-pointer hover:bg-white/30 transition-colors z-10">
+          <Settings className="w-5 h-5 text-white" />
+        </div>
+
+        {/* Center: Logo */}
+        <div className="absolute left-1/2 -translate-x-1/2">
+          <RoutefyLogo iconSize="h-14 w-auto" />
+        </div>
+
+        {/* Right: Notifications */}
+        <div className="flex items-center gap-[12px] z-10">
           <div className="relative" ref={notifRef}>
             <button onClick={() => setShowNotifications(!showNotifications)} className="w-[40px] h-[40px] rounded-[12px] bg-white/10 backdrop-blur-md flex items-center justify-center text-white relative border border-white/20 hover:scale-[1.02] transition-all">
               🔔
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-[#5B21B6]"></span>
+              <span className="absolute top-2 right-2 w-2 h-2 bg-[#F9DF77] rounded-full border-2 border-[#2F3273]"></span>
             </button>
             {showNotifications && (
               <div className="absolute right-0 top-[50px] w-[280px] bg-white rounded-[20px] p-4 shadow-xl border border-slate-100 z-50 animate-in fade-in zoom-in-95 duration-200">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-slate-900 font-bold text-sm">Notifications</h3>
-                  <button className="text-xs text-purple-600 hover:text-purple-700">Mark all read</button>
+                  <h3 className="text-slate-900 font-bold text-sm uppercase">NOTIFICATIONS</h3>
+                  <button className="text-xs text-[#4D50A2] hover:text-[#2F3273]">Mark all read</button>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">📦</div>
+                    <div className="w-8 h-8 rounded-full bg-blue-50 text-brand-main flex items-center justify-center shrink-0">📦</div>
                     <div>
                       <p className="text-sm text-slate-800 font-medium">Order #1024 Delivered</p>
                       <p className="text-xs text-slate-500">2 mins ago</p>
@@ -93,20 +98,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
             )}
           </div>
-          <div onClick={() => router.push('/dashboard/settings')} className="w-[40px] h-[40px] rounded-[12px] bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 cursor-pointer hover:bg-white/30 transition-colors">
-            <Settings className="w-5 h-5 text-white" />
-          </div>
         </div>
       </header>
 
       {/* Desktop Dark Sidebar */}
-      <aside className="hidden md:flex w-[240px] flex-col bg-slate-900 rounded-3xl sticky top-6 h-[calc(100vh-48px)] overflow-y-auto shrink-0 z-40 shadow-xl border border-slate-800">
-        <div className="p-8 flex items-center justify-center border-b border-slate-800">
+      <aside className="hidden md:flex w-[240px] flex-col bg-[#2F3273] rounded-3xl sticky top-6 h-[calc(100vh-48px)] overflow-y-auto shrink-0 z-40 shadow-xl border border-[#2F3273]/80">
+        <div className="p-8 flex items-center justify-center border-b border-white/10">
           <RoutefyLogo iconSize="w-24 h-auto" />
         </div>
 
         <div className="p-6 flex-1">
-          <div className="text-xs font-medium uppercase tracking-wider text-slate-400 mb-4 ml-2">Main Menu</div>
+          <div className="text-xs font-medium uppercase tracking-wider text-[#F9DF77]/70 mb-4 ml-2">Main Menu</div>
           <nav className="space-y-2">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
@@ -115,11 +117,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   key={item.name}
                   href={item.href}
                   className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl text-sm font-medium transition-all ${isActive
-                    ? 'bg-[#7C3AED] text-white shadow-lg shadow-[#7C3AED]/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                    ? 'bg-[#4D50A2] text-white shadow-lg shadow-[#4D50A2]/20'
+                    : 'text-white/60 hover:text-white hover:bg-white/5'
                     }`}
                 >
-                  <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                  <item.icon className={`w-5 h-5 ${isActive ? 'text-[#F9DF77]' : 'text-white/60'}`} />
                   {item.name}
                 </Link>
               );
@@ -127,10 +129,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
         </div>
 
-        <div className="p-6 border-t border-slate-800 mt-auto">
+        <div className="p-6 border-t border-white/10 mt-auto">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-4 px-5 py-3.5 w-full text-left rounded-2xl text-sm font-medium text-slate-400 hover:text-rose-400 hover:bg-slate-800/50 transition-all"
+            className="flex items-center gap-4 px-5 py-3.5 w-full text-left rounded-2xl text-sm font-medium text-white/60 hover:text-rose-400 hover:bg-white/5 transition-all"
           >
             <LogOut className="w-5 h-5" />
             Sign Out

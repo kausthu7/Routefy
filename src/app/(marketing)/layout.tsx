@@ -12,12 +12,10 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen text-slate-200 flex flex-col font-sans relative bg-slate-950 overflow-hidden">
       
       {/* Premium Animated Background shared across Landing and Login */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full mix-blend-screen animate-pulse" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full mix-blend-screen animate-pulse delay-1000" />
-      <div className="absolute top-[20%] right-[20%] w-[30%] h-[30%] bg-purple-600/10 blur-[100px] rounded-full mix-blend-screen" />
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#4D50A2]/20 blur-[120px] rounded-full mix-blend-screen animate-pulse" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#2F3273]/30 blur-[120px] rounded-full mix-blend-screen animate-pulse delay-1000" />
+      <div className="absolute top-[20%] right-[20%] w-[30%] h-[30%] bg-[#F9DF77]/10 blur-[100px] rounded-full mix-blend-screen" />
       
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
-
       {/* Header */}
       <header className="relative z-50 flex items-center justify-between px-6 py-6 md:px-12 max-w-[1400px] mx-auto w-full">
         <Link href="/" className="hover:scale-105 transition-transform">
@@ -36,7 +34,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           <Link href="/login" className="hidden md:flex text-[14px] font-[400] text-white hover:text-slate-300 px-4 py-2 border border-white/10 rounded-full bg-white/5 hover:bg-white/10 transition-all">
             Log in
           </Link>
-          <Link href="/login" className="bg-[#6D4AFF] hover:bg-[#5B3DF5] text-white text-[14px] font-[600] py-2.5 px-6 rounded-lg transition-all flex items-center shadow-[0_0_20px_rgba(109,74,255,0.4)]">
+          <Link href="/login" className="bg-[#4D50A2] hover:bg-[#2F3273] text-white text-[14px] font-[600] py-2.5 px-6 rounded-lg transition-all flex items-center shadow-[0_0_20px_rgba(77,80,162,0.4)]">
             Get Started
           </Link>
         </div>
